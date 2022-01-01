@@ -55,7 +55,6 @@ COCO_CLASSES = ('person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus',
                 'mouse', 'remote', 'keyboard', 'cell phone', 'microwave', 'oven',
                 'toaster', 'sink', 'refrigerator', 'book', 'clock', 'vase',
                 'scissors', 'teddy bear', 'hair drier', 'toothbrush')
-
 COCO_LABEL_MAP = { 1:  1,  2:  2,  3:  3,  4:  4,  5:  5,  6:  6,  7:  7,  8:  8,
                    9:  9, 10: 10, 11: 11, 13: 12, 14: 13, 15: 14, 16: 15, 17: 16,
                   18: 17, 19: 18, 20: 19, 21: 20, 22: 21, 23: 22, 24: 23, 25: 24,
@@ -66,6 +65,26 @@ COCO_LABEL_MAP = { 1:  1,  2:  2,  3:  3,  4:  4,  5:  5,  6:  6,  7:  7,  8:  8
                   62: 57, 63: 58, 64: 59, 65: 60, 67: 61, 70: 62, 72: 63, 73: 64,
                   74: 65, 75: 66, 76: 67, 77: 68, 78: 69, 79: 70, 80: 71, 81: 72,
                   82: 73, 84: 74, 85: 75, 86: 76, 87: 77, 88: 78, 89: 79, 90: 80}
+
+MVtec_CLASSES = ('person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus',
+                'train', 'truck', 'boat', 'traffic light', 'fire hydrant',
+                'stop sign', 'parking meter', 'bench', 'bird', 'cat', 'dog',
+                'horse', 'sheep', 'cow', 'elephant', 'bear', 'zebra', 'giraffe',
+                'backpack', 'umbrella', 'handbag', 'tie', 'suitcase', 'frisbee',
+                'skis', 'snowboard', 'sports ball', 'kite', 'baseball bat',
+                'baseball glove', 'skateboard', 'surfboard', 'tennis racket',
+                'bottle', 'wine glass', 'cup', 'fork', 'knife', 'spoon', 'bowl',
+                'banana', 'apple', 'sandwich', 'orange', 'broccoli', 'carrot',
+                'hot dog', 'pizza', 'donut', 'cake', 'chair', 'couch',
+                'potted plant', 'bed')
+MVtec_LABEL_MAP = {1:  1,  2:  2,  3:  3,  4:  4,  5:  5,  6:  6,  7:  7,  8:  8,
+                   9:  9, 10: 10, 11: 11, 12: 12, 13: 13, 14: 14, 15: 15, 16: 16,
+                  17: 17, 18: 18, 19: 19, 20: 20, 21: 21, 22: 22, 23: 23, 24: 24,
+                  25: 25, 26: 26, 27: 27, 28: 28, 29: 29, 30: 30, 31: 31, 32: 32,
+                  33: 33, 34: 34, 35: 35, 36: 36, 37: 37, 38: 38, 39: 39, 40: 40,
+                  41: 41, 42: 42, 43: 43, 44: 44, 45: 45, 46: 46, 47: 47, 48: 48,
+                  49: 49, 50: 50, 51: 51, 52: 52, 53: 53, 54: 54, 55: 55, 56: 56,
+                  57: 57, 58: 58, 59: 59, 60: 60}
 
 class Config(object):
     """
@@ -103,7 +122,7 @@ class Config(object):
         for k, v in vars(self).items():
             print(k, ' = ', v)
 
-
+# -------------------------- DATAS -------------------------- #
 dataset_base = Config({
     'name': 'Base Dataset',
 
@@ -126,12 +145,12 @@ dataset_base = Config({
     # If not specified, this just assumes category ids start at 1 and increase sequentially.
     'label_map': None
 })
-
+'''
 coco2017_dataset = dataset_base.copy({
    'name': 'COCO 2017',
 
     'train_prefix': './data/coco/',
-    'train_info': 'annotations/instances_train2017.json',
+    'train_info': 'annotations/instances_val2017.json',
     'trainimg_prefix': 'train2017/',
     'train_images': './data/coco/',
 
@@ -143,6 +162,40 @@ coco2017_dataset = dataset_base.copy({
     'label_map': COCO_LABEL_MAP
 
 
+})
+'''
+'''
+coco2017_dataset = dataset_base.copy({
+   'name': 'COCO 2017',
+
+    'train_prefix': '/home/w/data/COCO/',
+    'train_info': 'annotations/instances_val2014.json',
+    'trainimg_prefix': 'val2014/',
+    'train_images': '/home/w/data/COCO/',
+
+    'valid_prefix': '/home/w/data/COCO/',
+    'valid_info': 'annotations/instances_val2014.json',
+    'validimg_prefix': 'val2014/',
+    'valid_images': '/home/w/data/COCO/',
+
+    'label_map': COCO_LABEL_MAP
+})
+'''
+coco2017_dataset = dataset_base.copy({
+   'name': 'COCO 2017',
+
+    'train_prefix': '',
+    'train_info': '/home/w/data/MVtec/d2s_annotations_v1.1/annotations/D2S_validation.json',
+    'trainimg_prefix': '',
+    'train_images': '/home/w/data/MVtec/d2s_images_v1/images/',
+
+    'valid_prefix': '',
+    'valid_info': '/home/w/data/MVtec/d2s_annotations_v1.1/annotations/D2S_validation.json',
+    'validimg_prefix': '',
+    'valid_images': '/home/w/data/MVtec/d2s_images_v1/images/',
+
+    'class_names': MVtec_CLASSES,
+    'label_map': MVtec_LABEL_MAP
 })
 
 casia_SPT_val = dataset_base.copy({
@@ -162,8 +215,7 @@ casia_SPT_val = dataset_base.copy({
     'label_map': COCO_LABEL_MAP
 })
 
-# ----------------------- BACKBONES ----------------------- #
-
+# -------------------------- BACKBONES -------------------------- #
 backbone_base = Config({
     'name': 'Base Backbone',
     'path': 'path/to/pretrained/weights',
@@ -178,7 +230,6 @@ resnet18_backbone = backbone_base.copy({
     'frozen_stages': 1,
     'out_indices': (0, 1, 2, 3)
 })
-
 resnet34_backbone = backbone_base.copy({
     'name': 'resnet34',
     'path': './pretrained/resnet34_nofc.pth',
@@ -188,8 +239,7 @@ resnet34_backbone = backbone_base.copy({
     'out_indices': (0, 1, 2, 3)
 })
 
-
-#fpn config
+# -------------------------- FPN -------------------------- #
 fpn_base = Config({
     'in_channels': [64, 128, 256, 512],
     'out_channels': 256,
@@ -199,41 +249,35 @@ fpn_base = Config({
 
 
 # ----------------------- CONFIG DEFAULTS ----------------------- #
-
 coco_base_config = Config({
     'dataset': coco2017_dataset,
     'num_classes': 81, # This should include the background class
 
 })
 
-
-
-
-# ----------------------- SOLO v2.0 CONFIGS ----------------------- #
-
 solov2_base_config = coco_base_config.copy({
     'name': 'solov2_base',
  
-    'backbone': resnet18_backbone,
+    'backbone': resnet34_backbone,
 
     # Dataset stuff
-    'dataset': casia_SPT_val,
+    'dataset': coco2017_dataset,
     'num_classes': len(coco2017_dataset.class_names) + 1,
 
-    'imgs_per_gpu': 2,
-    'workers_per_gpu': 1,
+    'imgs_per_gpu': 4,
+    'workers_per_gpu': 4,
     'num_gpus': 1,
 
     'train_pipeline':  [
         dict(type='LoadImageFromFile'),                                #read img process 
-        dict(type='LoadAnnotations', with_bbox=True, with_mask=True),     #load annotations 
+        dict(type='LoadAnnotations', with_bbox=True, with_mask=True),  #load annotations 
         dict(type='Resize',                                             #多尺度训练，随即从后面的size选择一个尺寸
-            img_scale=[(768, 512), (768, 480), (768, 448),
-                    (768, 416), (768, 384), (768, 352)],
+            # img_scale=[(768, 512), (768, 480), (768, 448), (768, 416), (768, 384), (768, 352)],
+            img_scale=[(576, 368), (576, 400), (576, 432), (576, 464), (576, 496)],
             multiscale_mode='value',
             keep_ratio=True),
-        dict(type='RandomFlip', flip_ratio=0.5),                    #随机反转,0.5的概率
-        dict(type='Normalize', mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True),    #normallize                 
+        dict(type='RandomFlip', flip_ratio=0.5),                    # 随机反转,0.5的概率
+        dict(type='Normalize', mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True),               
         dict(type='Pad', size_divisor=32),                                #pad另一边的size为32的倍数，solov2对网络输入的尺寸有要求，图像的size需要为32的倍数
         dict(type='DefaultFormatBundle'),                                #将数据转换为tensor，为后续网络计算
         dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels', 'gt_masks'], meta_keys=('filename', 'ori_shape', 'img_shape', 'pad_shape',
@@ -243,11 +287,13 @@ solov2_base_config = coco_base_config.copy({
     'test_cfg': None,
 
     # learning policy
-    'lr_config': dict(policy='step', warmup='linear', warmup_iters=500, warmup_ratio=0.01, step=[27, 33]),
-    'total_epoch': 36,
+    'lr_config': dict(policy='step', warmup='linear', warmup_iters=500, warmup_ratio=0.005, step=[35, 60, 80, 90]),
+    #'lr_config': dict(policy='step', warmup='linear', warmup_iters=500, warmup_ratio=0.01, step=[4, 6, 8, 10]),
+
+    'total_epoch': 100,
 
     # optimizer
-    'optimizer': dict(type='SGD', lr=0.01, momentum=0.9, weight_decay=0.0001),  
+    'optimizer': dict(type='SGD', lr=0.005, momentum=0.9, weight_decay=0.0001),  
 
     'optimizer_config': dict(grad_clip=dict(max_norm=35, norm_type=2)),   #梯度平衡策略
 
@@ -272,13 +318,13 @@ solov2_base_config = coco_base_config.copy({
     ],
 
     'test_cfg': dict(
-                nms_pre=500,
+                nms_pre=200,
                 score_thr=0.1,
-                mask_thr=0.5,
-                update_thr=0.05,
+                mask_thr=0.6,
+                update_thr=0.06,
                 kernel='gaussian',  # gaussian/linear
                 sigma=2.0,
-                max_per_img=30)
+                max_per_img=15)
 
 })
 
