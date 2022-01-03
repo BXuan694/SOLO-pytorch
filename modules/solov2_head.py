@@ -58,9 +58,7 @@ class SOLOv2Head(nn.Module):
         self.base_edge_list = base_edge_list
         self.scale_ranges = scale_ranges
         
-        self.loss_cate = FocalLoss(use_sigmoid=True,gamma=2.0,
-            alpha=0.25,
-            loss_weight=1.0)   #build_loss Focal_loss
+        self.loss_cate = FocalLoss(use_sigmoid=True, gamma=2.0, alpha=0.25, loss_weight=1.0)
 
         self.ins_loss_weight = 3.0  #loss_ins['loss_weight']  #3.0
         self.norm_cfg = norm_cfg

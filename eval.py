@@ -1,12 +1,7 @@
 from data.config import cfg, process_funcs_dict
-from data.coco import CocoDataset
-from data.loader import build_dataloader
 from modules.solov2 import SOLOV2
-import torch.optim as optim
 import time
-import argparse
 import torch
-from torch.nn.utils import clip_grad
 import pycocotools.mask as mask_util
 import numpy as np
 import cv2 as cv
@@ -17,7 +12,7 @@ import json
 import os
 from scipy import ndimage
 from data.imgutils import rescale_size, imresize, imrescale, imflip, impad, impad_to_multiple
-
+from PIL import Image
 
 COCO_LABEL = [1,  2,  3,  4,  5,  6,  7,  8,
                    9, 10, 11, 13, 14, 15, 16, 17,
@@ -29,7 +24,6 @@ COCO_LABEL = [1,  2,  3,  4,  5,  6,  7,  8,
                   62, 63, 64, 65, 67, 70, 72, 73,
                   74, 75, 76, 77, 78, 79, 80, 81,
                   82, 84, 85, 86, 87, 88, 89, 90]
-
 COCO_LABEL_MAP = { 1:  1,  2:  2,  3:  3,  4:  4,  5:  5,  6:  6,  7:  7,  8:  8,
                    9:  9, 10: 10, 11: 11, 13: 12, 14: 13, 15: 14, 16: 15, 17: 16,
                   18: 17, 19: 18, 20: 19, 21: 20, 22: 21, 23: 22, 24: 23, 25: 24,
@@ -40,7 +34,6 @@ COCO_LABEL_MAP = { 1:  1,  2:  2,  3:  3,  4:  4,  5:  5,  6:  6,  7:  7,  8:  8
                   62: 57, 63: 58, 64: 59, 65: 60, 67: 61, 70: 62, 72: 63, 73: 64,
                   74: 65, 75: 66, 76: 67, 77: 68, 78: 69, 79: 70, 80: 71, 81: 72,
                   82: 73, 84: 74, 85: 75, 86: 76, 87: 77, 88: 78, 89: 79, 90: 80}
-
 COCO_CLASSES = ('person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus',
                 'train', 'truck', 'boat', 'traffic light', 'fire hydrant',
                 'stop sign', 'parking meter', 'bench', 'bird', 'cat', 'dog',
@@ -55,7 +48,6 @@ COCO_CLASSES = ('person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus',
                 'mouse', 'remote', 'keyboard', 'cell phone', 'microwave', 'oven',
                 'toaster', 'sink', 'refrigerator', 'book', 'clock', 'vase',
                 'scissors', 'teddy bear', 'hair drier', 'toothbrush')
-
 CLASS_NAMES=(COCO_CLASSES, COCO_LABEL)
 
 def get_masks(result, num_classes=80):
@@ -76,10 +68,10 @@ def get_masks(result, num_classes=80):
 
         return masks
 
-#set requires_grad False
-def gradinator(x):
-    x.requires_grad = False
-    return x
+# set requires_grad False
+def gradinator(x_):
+    x_.requires_grad = False
+    return x_
 
 def build_process_pipeline(pipeline_confg):
     assert isinstance(pipeline_confg, list)
@@ -136,13 +128,15 @@ class LoadImageInfo(object):
         results['ori_shape'] = frame.shape
         return results
 
-
-def show_result_ins(img,
+def show_result_ins(imgAbsPath,
                     result,
-                    score_thr=0.3,
+                    score_thr=0.7,
                     sort_by_density=False):
-    if isinstance(img, str):
-        img = cv.imread(img)
+
+    if isinstance(imgAbsPath, str):
+        print(imgAbsPath)
+        img = cv.imread(imgAbsPath)
+        img = cv.resize(img, (576, 432))
     img_show = img.copy()
     h, w, _ = img.shape
 
@@ -171,36 +165,35 @@ def show_result_ins(img,
         cate_label = cate_label[orders]
         cate_score = cate_score[orders]
 
-    np.random.seed(42)
     color_masks = [
-        np.random.randint(0, 256, (1, 3), dtype=np.uint8)
-        for _ in range(num_mask)
+        np.random.randint(0, 256, (1, 3), dtype=np.uint8) for _ in range(num_mask)
     ]
-    #img_show = None
+
     for idx in range(num_mask):
         idx = -(idx+1)
         cur_mask = seg_label[idx, :, :]
         cur_mask = imresize(cur_mask, (w, h))
         cur_mask = (cur_mask > 0.5).astype(np.uint8)
+        im = Image.fromarray(cur_mask*255)
+        _, fname = os.path.split(imgAbsPath)
+        bname, _ = os.path.splitext(fname)
+        im.save("./results/"+bname+"_"+str(idx)+'_'+str(COCO_LABEL_MAP[COCO_LABEL[cate_label[idx]]])+'_'+str(cate_score[idx])+".jpg")
+        
         if cur_mask.sum() == 0:
             continue
         color_mask = color_masks[idx]
         cur_mask_bool = cur_mask.astype(np.bool)
         img_show[cur_mask_bool] = img[cur_mask_bool] * 0.5 + color_mask * 0.5
 
-        #当前实例的类别
-        cur_cate = cate_label[idx]
-        realclass = COCO_LABEL[cur_cate]
+        # 存图
         cur_score = cate_score[idx]
+        cur_cate = cate_label[idx]
 
-        name_idx = COCO_LABEL_MAP[realclass]
-        label_text = COCO_CLASSES[name_idx-1]
-        label_text += '|{:.02f}'.format(cur_score)
+        label_text = COCO_CLASSES[COCO_LABEL_MAP[COCO_LABEL[cur_cate]]-1] + '|{:.02f}'.format(cur_score)
         center_y, center_x = ndimage.measurements.center_of_mass(cur_mask)
         vis_pos = (max(int(center_x) - 10, 0), int(center_y))
-        cv.putText(img_show, label_text, vis_pos,
-                        cv.FONT_HERSHEY_COMPLEX, 0.3, (255, 255, 255))  # green
- 
+        cv.putText(img_show, label_text, vis_pos, cv.FONT_HERSHEY_COMPLEX, 0.3, (255, 255, 255))
+
     return img_show
 
 
@@ -214,7 +207,7 @@ def eval(valmodel_weight, data_path, benchmark, test_mode, save_imgs=False):
                 dict(type='TestCollect', keys=['img']),
     ]
     transforms_piplines = build_process_pipeline(transforms)
-    Multest = process_funcs_dict['MultiScaleFlipAug'](transforms = transforms_piplines, img_scale = (480, 448), flip=False)
+    Multest = process_funcs_dict['MultiScaleFlipAug'](transforms=transforms_piplines, img_scale=(480, 448), flip=False)
 
     if test_mode == "video":
         test_pipeline.append(LoadImageInfo())
@@ -227,7 +220,6 @@ def eval(valmodel_weight, data_path, benchmark, test_mode, save_imgs=False):
 
     model = SOLOV2(cfg, pretrained=valmodel_weight, mode='test')
     model = model.cuda()
-
 
     if test_mode == "video":
         vid = cv.VideoCapture(data_path)
@@ -255,30 +247,26 @@ def eval(valmodel_weight, data_path, benchmark, test_mode, save_imgs=False):
             print("spend time: ",(end-start))
             cv.imshow("watch windows",img_show)
             cv.waitKey(1)
-
-    if test_mode == "images":
+    elif test_mode == "images":
         img_ids = []
         images = []
-        use_json = False
-        imgs_prefix = "tests"
-        test_imgpath = data_path
+        use_json = True
         if use_json == False:
-            test_imgpath = test_imgpath + '/*'
+            test_imgpath = data_path + '/*'
             images = glob(test_imgpath)
             for img in images:
-                pathname,filename = os.path.split(img)
-                prefix,suffix = os.path.splitext(filename)
+                _, filename = os.path.split(img)
+                prefix, _ = os.path.splitext(filename)
                 img_id = int(prefix)
                 img_ids.append(str(img_id))  
         else:
-            imgsinfo=json.load(open("data/casia-SPT_val/val/val_annotation.json",'r'))
+            imgsinfo = json.load(open(data_path,'r'))
             for i in range(len(imgsinfo['images'])):
                 img_id = imgsinfo['images'][i]['id']
-                img_path = imgs_prefix + '/'+ imgsinfo['images'][i]['file_name']
+                img_path = "/home/w/data/MVtec/d2s_images_v1/images/" + imgsinfo['images'][i]['file_name']
                 img_ids.append(img_id)
                 images.append(img_path)
 
-        imgs_nums = len(images)
         results = []
         k = 0
         for imgpath in images:
@@ -297,7 +285,7 @@ def eval(valmodel_weight, data_path, benchmark, test_mode, save_imgs=False):
             #cv.waitKey(1)
             out_filepath = "results/" + os.path.basename(imgpath)
 
-            k = k + 1
+            k += 1
             if save_imgs:
                 cv.imwrite(out_filepath, img_show)
             if benchmark == True:
@@ -310,5 +298,5 @@ def eval(valmodel_weight, data_path, benchmark, test_mode, save_imgs=False):
             fjson.write(re_js)
             fjson.close()
 
-eval(valmodel_weight='pretrained/solov2_448_r18_epoch_36.pth',data_path="data/casia-SPT_val/val/JPEGImages", benchmark=False, test_mode="images", save_imgs=False)
+eval(valmodel_weight='weights/solov2_resnet34_epoch_60.pth',data_path="/home/w/data/MVtec/d2s_annotations_v1.1/annotations/D2S_validation.json", benchmark=False, test_mode="images", save_imgs=True)
 #eval(valmodel_weight='pretrained/solov2_448_r18_epoch_36.pth',data_path="cam0.avi", benchmark=False, test_mode="video")

@@ -8,9 +8,7 @@ from .mask_feat_head import MaskFeatHead
 import torch.distributed as dist
 import torch.multiprocessing as m
 from itertools import chain
-
 from torch.nn.parallel import DataParallel
-
 
 
 class FPN(nn.Module):
@@ -133,10 +131,7 @@ class FPN(nn.Module):
 
 class SOLOV2(nn.Module):
     
-    def __init__(self,
-                 cfg=None,
-                 pretrained=None,
-                 mode='train'):
+    def __init__(self, cfg=None, pretrained=None, mode='train'):
         super(SOLOV2, self).__init__()
         if cfg.backbone.name == 'resnet18':
             self.backbone = resnet18(pretrained=True, loadpath = cfg.backbone.path)
@@ -145,17 +140,17 @@ class SOLOV2(nn.Module):
         else:
             raise NotImplementedError
         
-        #this set only support resnet18 and resnet34 backbone, 可以根据solo中resent50的配置进行更改，使其支持resnset50的训练，下同
+        # this set only support resnet18 and resnet34 backbone, 可以根据solo中resent50的配置进行更改，使其支持resnset50的训练，下同
         self.fpn = FPN(in_channels=[64, 128, 256, 512],out_channels=256,start_level=0,num_outs=5,upsample_cfg=dict(mode='nearest'))
 
-        #this set only support resnet18 and resnet34 backbone
+        # this set only support resnet18 and resnet34 backbone
         self.mask_feat_head = MaskFeatHead(in_channels=256,
                             out_channels=128,
                             start_level=0,
                             end_level=3,
 
                             num_classes=128)
-        #this set only support resnet18 and resnet34 backbone
+        # this set only support resnet18 and resnet34 backbone
         self.bbox_head = SOLOv2Head(num_classes=81,
                             in_channels=256,
                             seg_feat_channels=256,
@@ -181,14 +176,14 @@ class SOLOV2(nn.Module):
             self.load_weights(pretrained)             #load weight from file
     
     def init_weights(self):
-        #fpn
+        # fpn
         if isinstance(self.fpn, nn.Sequential):
             for m in self.fpn:
                 m.init_weights()
         else:
             self.fpn.init_weights()
         
-        #mask feature mask
+        # mask feature head
         if isinstance(self.mask_feat_head, nn.Sequential):
             for m in self.mask_feat_head:
                 m.init_weights()
@@ -246,13 +241,10 @@ class SOLOV2(nn.Module):
 
         x = self.extract_feat(img)
         outs = self.bbox_head(x)
-        mask_feat_pred = self.mask_feat_head(
-                x[self.mask_feat_head.
-                  start_level:self.mask_feat_head.end_level + 1])
+        mask_feat_pred = self.mask_feat_head(x[self.mask_feat_head.start_level : self.mask_feat_head.end_level+1])
         loss_inputs = outs + (mask_feat_pred, gt_bboxes, gt_labels, gt_masks, img_metas)
 
-        losses = self.bbox_head.loss(
-            *loss_inputs, gt_bboxes_ignore=gt_bboxes_ignore)
+        losses = self.bbox_head.loss(*loss_inputs, gt_bboxes_ignore=gt_bboxes_ignore)
         return losses
 
   
@@ -297,7 +289,6 @@ class SOLOV2(nn.Module):
             return self.aug_test(imgs, img_metas, **kwargs)
     
     def simple_test(self, img, img_meta, rescale=False):
-       
         #test_tensor = torch.ones(1,3,448,512).cuda()
         #x = self.extract_feat(test_tensor)
         x = self.extract_feat(img)
@@ -305,8 +296,7 @@ class SOLOV2(nn.Module):
         outs = self.bbox_head(x,eval=True)
   
         mask_feat_pred = self.mask_feat_head(
-                x[self.mask_feat_head.
-                  start_level:self.mask_feat_head.end_level + 1])
+                x[self.mask_feat_head.start_level : self.mask_feat_head.end_level+1])
 
         seg_inputs = outs + (mask_feat_pred, img_meta, self.test_cfg, rescale)
 
@@ -316,104 +306,3 @@ class SOLOV2(nn.Module):
     def aug_test(self, imgs, img_metas, rescale=False):
         """Test function with test time augmentation."""
         raise NotImplementedError
-
-
-# not use 
-'''
-def get_dist_info():
-
-    if dist.is_available():
-        initialized = dist.is_initialized()
-    else:
-        initialized = False
-    if initialized:
-        rank = dist.get_rank()
-        world_size = dist.get_world_size()
-    else:
-        rank = 0
-        world_size = 1
-    return rank, world_size
-
-
-def load_state_dict(module, state_dict, strict=False):
-   
-    unexpected_keys = []
-    all_missing_keys = []
-    err_msg = []
-
-    metadata = getattr(state_dict, '_metadata', None)
-    state_dict = state_dict.copy()
-    if metadata is not None:
-        state_dict._metadata = metadata
-
-    # use _load_from_state_dict to enable checkpoint version control
-    def load(module, prefix=''):
-        # recursively check parallel module in case that the model has a
-        # complicated structure, e.g., nn.Module(nn.Module(DDP))
-        if is_module_wrapper(module):
-            module = module.module
-        local_metadata = {} if metadata is None else metadata.get(
-            prefix[:-1], {})
-        module._load_from_state_dict(state_dict, prefix, local_metadata, True,
-                                     all_missing_keys, unexpected_keys,
-                                     err_msg)
-        for name, child in module._modules.items():
-            if child is not None:
-                load(child, prefix + name + '.')
-
-    load(module)
-    load = None  # break load->load reference cycle
-
-    # ignore "num_batches_tracked" of BN layers
-    missing_keys = [
-        key for key in all_missing_keys if 'num_batches_tracked' not in key
-    ]
-
-    if unexpected_keys:
-        err_msg.append('unexpected key in source '
-                       f'state_dict: {", ".join(unexpected_keys)}\n')
-    if missing_keys:
-        err_msg.append(
-            f'missing keys in source state_dict: {", ".join(missing_keys)}\n')
-
-    rank, _ = get_dist_info()
-    if len(err_msg) > 0 and rank == 0:
-        err_msg.insert(
-            0, 'The model and loaded state dict do not match exactly\n')
-        err_msg = '\n'.join(err_msg)
-        if strict:
-            raise RuntimeError(err_msg)
-        else:
-            print(err_msg)
-
-
-def _load_checkpoint(filename, map_location=None):
-    
-    if not osp.isfile(filename):
-        raise IOError(f'{filename} is not a checkpoint file')
-    checkpoint = torch.load(filename, map_location=map_location)
-    return checkpoint
-
-
-def load_checkpoint(model,
-                    filename,
-                    map_location=None,
-                    strict=False):
-
-    checkpoint = _load_checkpoint(filename, map_location)
-    # OrderedDict is a subclass of dict
-    if not isinstance(checkpoint, dict):
-        raise RuntimeError(
-            f'No state_dict found in checkpoint file {filename}')
-    # get state_dict from checkpoint
-    if 'state_dict' in checkpoint:
-        state_dict = checkpoint['state_dict']
-    else:
-        state_dict = checkpoint
-    # strip prefix of state_dict
-    if list(state_dict.keys())[0].startswith('module.'):
-        state_dict = {k[7:]: v for k, v in checkpoint['state_dict'].items()}
-    # load state_dict
-    load_state_dict(model, state_dict, strict)
-    return checkpoint
-'''
