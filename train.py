@@ -4,6 +4,7 @@ from data.loader import build_dataloader
 from modules.solov2 import SOLOV2
 import time
 import torch
+import numpy as np
 
 # 梯度均衡
 def clip_grads(params_):
@@ -47,6 +48,7 @@ def get_warmup_lr(curIter_, totalIters_, baseLr_, warmupRatio_, warmUpOption='li
 
 
 def train(globalStartEpoch=1, totalEpoches=36):
+
     # train process pipelines func
     trainTransformsPiplines = build_process_pipeline(cfg.train_pipeline)
     print(trainTransformsPiplines)
@@ -56,88 +58,66 @@ def train(globalStartEpoch=1, totalEpoches=36):
                             img_prefix = cfg.dataset.trainimg_prefix,
                             data_root=cfg.dataset.train_prefix)
     torchdataLoader = build_dataloader(casiadata, cfg.imgs_per_gpu, cfg.workers_per_gpu, num_gpus=cfg.num_gpus, shuffle=True)
-    batchSize = cfg.imgs_per_gpu * cfg.num_gpus
-    epochSize = len(casiadata) // batchSize  
-    
+
     if cfg.resume_from is None:
         model = SOLOV2(cfg, pretrained=None, mode='train')
         print('cfg.resume_from is None')
     else:
         model = SOLOV2(cfg, pretrained=cfg.resume_from, mode='train')
-    
     model = model.cuda()
     model = model.train()
+
+    lrOri = cfg.optimizer['lr']
+    lrStages = cfg.lr_config["step"]
+    lrList = np.full(totalEpoches, lrOri)
+    for ii in range(len(lrStages)):
+        lrList[lrStages[ii]:]*=0.1
+    print("starting epoch: ", globalStartEpoch)
+    print("lr adapting stages: ", end=' ')
+    for ii in range(len(lrStages)):
+        print(cfg.lr_config["step"][ii], end=" ")
+    print("\ntotal training epoches: ", totalEpoches)
 
     optimizer_config = cfg.optimizer
     optimizer = torch.optim.SGD(model.parameters(), lr=optimizer_config['lr'], momentum=optimizer_config['momentum'], weight_decay=optimizer_config['weight_decay'])
 
-    numStages = len(cfg.lr_config["step"])
-    print("starting epoch: ", globalStartEpoch)
-    print("lr adapting stages: ", end=' ')
-    for ii in range(numStages):
-        print(cfg.lr_config["step"][ii], end=" ")
-    print("\ntotal training epoches: ", totalEpoches)
-
-    lrOri = cfg.optimizer['lr']
-    if globalStartEpoch < cfg.lr_config["step"][0]:
-        set_lr(optimizer, lrOri)
-    elif globalStartEpoch >= totalEpoches:
-        print("Starting epoch is too large, no more training is needed.")
-        exit()
-    else:
-        for ii in range(numStages-1):
-            if cfg.lr_config["step"][ii] <= globalStartEpoch < cfg.lr_config["step"][ii+1]:
-                set_lr(optimizer, lrOri*(0.1**(ii+1)))
-                break
-    
+    batchSize = cfg.imgs_per_gpu * cfg.num_gpus
+    epochSize = len(casiadata) // batchSize  
     # nums of trained epoches, idx of epoch to start
     pastEpoches = globalStartEpoch
     # nums of trained iters, idx of iter to start
     pastIters = (globalStartEpoch-1) * epochSize
-
     # nums of left epoches
     leftEpoches = totalEpoches - pastEpoches + 1
     # nums of left iters
     leftIters = leftEpoches * epochSize
 
-    base_lr = optimizer_config['lr']
-    cur_lr = base_lr
     print('##### begin train ######')
     currentIter = 0   
  
     for epoch in range(leftEpoches):
+
         currentEpoch = epoch + pastEpoches
+        # 终止训练
+        if currentEpoch >= totalEpoches:
+            print("Current epoch is larger than setting epoch nums, training stop.")
+            return
 
         # 仅用于打印
         loss_sum = 0.0 
         loss_ins = 0.0 
         loss_cate = 0.0
-
-        # 每个epoch更新base_lr
-        lrOri = cfg.optimizer['lr']
-        if currentEpoch >= totalEpoches:
-            raise NotImplementedError("train epoch is done!")
-        elif currentEpoch < cfg.lr_config["step"][0]:
-            base_lr = lrOri
-        else:
-            coeff = 0.1
-            for ii in range(numStages-1):
-                if cfg.lr_config["step"][ii] <= globalStartEpoch < cfg.lr_config["step"][ii+1]:
-                    for _ in range(ii):
-                        coeff *= 0.1
-                    break
-            base_lr = lrOri * coeff
-        print("base_lr: ", base_lr)
-        
+       
         for j, data in enumerate(torchdataLoader):
+            iterStartTime = time.time()
+
             if cfg.lr_config['warmup'] is not None and pastIters < cfg.lr_config['warmup_iters']:
                 cur_lr = get_warmup_lr(pastIters, cfg.lr_config['warmup_iters'],
                                         optimizer_config['lr'], cfg.lr_config['warmup_ratio'],
                                         cfg.lr_config['warmup'])
             else:
-                cur_lr = base_lr
+                cur_lr = lrList[currentEpoch]
             set_lr(optimizer, cur_lr)
-            last_time = time.time()
 
             imgs = gradinator(data['img'].data[0].cuda())
             img_meta = data['img_metas'].data[0]   #图片的一些原始信息
@@ -152,7 +132,8 @@ def train(globalStartEpoch=1, totalEpoches=36):
             for label in data['gt_labels'].data[0]:
                 label = gradinator(label.cuda())
                 gt_labels.append(label)
-            
+
+
             loss = model.forward(img=imgs,
                     img_meta=img_meta,
                     gt_bboxes=gt_bboxes,
@@ -161,9 +142,9 @@ def train(globalStartEpoch=1, totalEpoches=36):
 
 
             losses = loss['loss_ins'] + loss['loss_cate']
-            loss_sum = loss_sum + losses.cpu().item()
-            loss_ins = loss_ins + loss['loss_ins'].cpu().item()
-            loss_cate = loss_cate + loss['loss_cate'].cpu().item()
+            loss_sum += losses.cpu().item()
+            loss_ins += loss['loss_ins'].cpu().item()
+            loss_cate += loss['loss_cate'].cpu().item()
 
             optimizer.zero_grad()
             losses.backward()
@@ -175,28 +156,29 @@ def train(globalStartEpoch=1, totalEpoches=36):
                 NotImplementedError("loss type error!can't backward!")
 
             leftIters -= 1
-            use_time = time.time() - last_time
             pastIters += 1
             currentIter += 1
 
-            if j%50 == 0 and j != 0:
-                left_time = use_time * (leftIters-currentIter)
-                left_minut = left_time / 60.0
-                left_hours = left_minut / 60.0
-                left_day = left_hours // 24
-                left_hour = left_hours % 24
+            showIters = 100.0
+            if j%int(showIters) == 0 and j != 0:
+                iterLastTime = time.time() - iterStartTime
+                left_seconds = iterLastTime * (leftIters-currentIter)
+                left_minutes = left_seconds / 60.0
+                left_hours = left_minutes / 60.0
+                left_days = left_hours // 24
+                left_hours = left_hours % 24
 
-                out_srt = 'epoch:[' + str(epoch + pastEpoches) + ']/[' + str(totalEpoches) + '],';
-                out_srt = out_srt + '[' + str(j) + ']/' + str(epochSize) + '], left_time:' + str(left_day) + 'days,' + format(left_hour,'.2f') + 'h,'
-                print(out_srt, "loss: ", format(loss_sum/50.0,'.4f'), ' loss_ins:', format(loss_ins/50.0,'.4f'), "loss_cate:", format(loss_cate/50.0,'.4f'), "lr:",  format(cur_lr,'.8f'), "base_lr:",  format(base_lr,'.8f'))
+                out_srt = 'epoch:['+str(currentEpoch)+']/['+str(totalEpoches)+'],' # end of epoch of idx currentEpoch
+                out_srt = out_srt + '['+str(j)+']/'+str(epochSize)+'], left_time: ' + str(left_days)+'days '+format(left_hours,'.2f')+'hours,'
+                print(out_srt, "loss:", format(loss_sum/showIters,'.4f'), 'loss_ins:', format(loss_ins/showIters,'.4f'), "loss_cate:", format(loss_cate/showIters,'.4f'), "lr:", format(cur_lr,'.8f'))
                 loss_sum = 0.0 
                 loss_ins = 0.0 
                 loss_cate = 0.0
 
         leftEpoches -= 1
 
-        save_name = "./weights/solov2_" + cfg.backbone.name + "_epoch_" + str(epoch + pastEpoches) + ".pth"
+        save_name = "./weights/solov2_" + cfg.backbone.name + "_epoch_" + str(currentEpoch) + "_mvtec.pth"
         model.save_weights(save_name)        
 
 if __name__ == '__main__':
-    train(globalStartEpoch=cfg.epoch_iters_start, totalEpoches = cfg.total_epoch)   #设置本次训练的起始epoch
+    train(globalStartEpoch=cfg.epoch_iters_start, totalEpoches=cfg.total_epoch)   #设置本次训练的起始epoch
