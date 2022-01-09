@@ -186,13 +186,13 @@ coco2017_dataset = dataset_base.copy({
 
     'train_prefix': '',
     'train_info': '/home/w/data/MVtec/d2s_annotations_v1.1/annotations/D2S_validation.json',
-    'trainimg_prefix': '',
-    'train_images': '/home/w/data/MVtec/d2s_images_v1/images/',
+    'trainimg_prefix': '/home/w/data/MVtec/d2s_images_v1/images/',
+    'train_images': '',
 
     'valid_prefix': '',
     'valid_info': '/home/w/data/MVtec/d2s_annotations_v1.1/annotations/D2S_validation.json',
-    'validimg_prefix': '',
-    'valid_images': '/home/w/data/MVtec/d2s_images_v1/images/',
+    'validimg_prefix': '/home/w/data/MVtec/d2s_images_v1/images/',
+    'valid_images': '',
 
     'class_names': MVtec_CLASSES,
     'label_map': MVtec_LABEL_MAP
@@ -249,24 +249,18 @@ fpn_base = Config({
 
 
 # ----------------------- CONFIG DEFAULTS ----------------------- #
-coco_base_config = Config({
+base_config = Config({
     'dataset': coco2017_dataset,
     'num_classes': 81, # This should include the background class
-
 })
 
-solov2_base_config = coco_base_config.copy({
+solov2_mvtec_config = base_config.copy({
     'name': 'solov2_base',
- 
     'backbone': resnet34_backbone,
-
     # Dataset stuff
     'dataset': coco2017_dataset,
     'num_classes': len(coco2017_dataset.class_names) + 1,
 
-    'imgs_per_gpu': 4,
-    'workers_per_gpu': 4,
-    'num_gpus': 1,
 
     'train_pipeline':  [
         dict(type='LoadImageFromFile'),                                #read img process 
@@ -283,24 +277,6 @@ solov2_base_config = coco_base_config.copy({
         dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels', 'gt_masks'], meta_keys=('filename', 'ori_shape', 'img_shape', 'pad_shape',
                             'scale_factor', 'flip', 'img_norm_cfg')),   
     ],
-
-    'test_cfg': None,
-
-    # learning policy
-    'lr_config': dict(policy='step', warmup='linear', warmup_iters=500, warmup_ratio=0.005, step=[35, 60, 80, 90]),
-    #'lr_config': dict(policy='step', warmup='linear', warmup_iters=500, warmup_ratio=0.01, step=[4, 6, 8, 10]),
-
-    'total_epoch': 100,
-
-    # optimizer
-    'optimizer': dict(type='SGD', lr=0.005, momentum=0.9, weight_decay=0.0001),  
-
-    'optimizer_config': dict(grad_clip=dict(max_norm=35, norm_type=2)),   #梯度平衡策略
-
-    'resume_from': None,    #从保存的权重文件中读取，如果为None则权重自己初始化
-    
-    'epoch_iters_start': 1,    #本次训练的开始迭代起始轮数
-
     'test_pipeline': [
         dict(type='LoadImageFromFile'),
         dict(
@@ -316,7 +292,6 @@ solov2_base_config = coco_base_config.copy({
                 dict(type='Collect', keys=['img']),
             ])
     ],
-
     'test_cfg': dict(
                 nms_pre=200,
                 score_thr=0.1,
@@ -324,11 +299,24 @@ solov2_base_config = coco_base_config.copy({
                 update_thr=0.06,
                 kernel='gaussian',  # gaussian/linear
                 sigma=2.0,
-                max_per_img=15)
+                max_per_img=15),
 
+    'imgs_per_gpu': 4,
+    'workers_per_gpu': 4,
+    'num_gpus': 1,
+    # learning policy
+    'lr_config': dict(policy='step', warmup='linear', warmup_iters=500, warmup_ratio=0.005, step=[35, 60, 80, 90]),
+    #'lr_config': dict(policy='step', warmup='linear', warmup_iters=500, warmup_ratio=0.01, step=[4, 6, 8, 10]),
+    # optimizer
+    'optimizer': dict(type='SGD', lr=0.005, momentum=0.9, weight_decay=0.0001),  
+    'optimizer_config': dict(grad_clip=dict(max_norm=35, norm_type=2)),   #梯度平衡策略
+
+    'resume_from': None,    #从保存的权重文件中读取，如果为None则权重自己初始化
+    'total_epoch': 100,
+    'epoch_iters_start': 1,    #本次训练的开始迭代起始轮数
 })
 
-cfg = solov2_base_config.copy()
+cfg = solov2_mvtec_config.copy()
 
 
 def set_cfg(config_name:str):
