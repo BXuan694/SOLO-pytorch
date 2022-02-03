@@ -86,6 +86,9 @@ MVtec_LABEL_MAP = {1:  1,  2:  2,  3:  3,  4:  4,  5:  5,  6:  6,  7:  7,  8:  8
                   49: 49, 50: 50, 51: 51, 52: 52, 53: 53, 54: 54, 55: 55, 56: 56,
                   57: 57, 58: 58, 59: 59, 60: 60}
 
+BL_CLASSES = ('bl')
+BL_LABEL_MAP = {1:  1}
+
 class Config(object):
     """
     After implement this class, you can call 'cfg.x' instead of 'cfg['x']' to get a certain parameter.
@@ -197,6 +200,24 @@ coco2017_dataset = dataset_base.copy({
     'class_names': MVtec_CLASSES,
     'label_map': MVtec_LABEL_MAP
 })
+
+bl_dataset = dataset_base.copy({
+    'name': 'COCO 2017',
+
+    'train_prefix': '',
+    'train_info': '/home/w/data/BL/bl121/labelCOCO/anno.json',
+    'trainimg_prefix': '',
+    'train_images': '',
+
+    'valid_prefix': '',
+    'valid_info': '/home/w/data/MVtec/d2s_annotations_v1.1/annotations/D2S_validation.json',
+    'validimg_prefix': '',
+    'valid_images': '',
+
+    'class_names': BL_CLASSES,
+    'label_map': BL_LABEL_MAP
+})
+
 
 casia_SPT_val = dataset_base.copy({
     'name': 'casia-SPT 2020',
@@ -316,7 +337,69 @@ solov2_mvtec_config = base_config.copy({
     'epoch_iters_start': 1,    #本次训练的开始迭代起始轮数
 })
 
-cfg = solov2_mvtec_config.copy()
+solov2_bl_config = base_config.copy({
+    'name': 'solov2_base',
+    'backbone': resnet34_backbone,
+    # Dataset stuff
+    'dataset': bl_dataset,
+    'num_classes': len(bl_dataset.class_names) + 1,
+
+
+    'train_pipeline':  [
+        dict(type='LoadImageFromFile'),                                #read img process 
+        dict(type='LoadAnnotations', with_bbox=True, with_mask=True),  #load annotations 
+        dict(type='Resize',                                             #多尺度训练，随即从后面的size选择一个尺寸
+            # img_scale=[(768, 512), (768, 480), (768, 448), (768, 416), (768, 384), (768, 352)],
+            img_scale=[(512, 512)],
+            multiscale_mode='value',
+            keep_ratio=True),
+        dict(type='RandomFlip', flip_ratio=0.5),                    # 随机反转,0.5的概率
+        dict(type='Normalize', mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True),               
+        dict(type='Pad', size_divisor=32),                                #pad另一边的size为32的倍数，solov2对网络输入的尺寸有要求，图像的size需要为32的倍数
+        dict(type='DefaultFormatBundle'),                                #将数据转换为tensor，为后续网络计算
+        dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels', 'gt_masks'], meta_keys=('filename', 'ori_shape', 'img_shape', 'pad_shape',
+                            'scale_factor', 'flip', 'img_norm_cfg')),   
+    ],
+    'test_pipeline': [
+        dict(type='LoadImageFromFile'),
+        dict(
+            type='MultiScaleFlipAug',
+            img_scale=(768, 448),
+            flip=False,
+            transforms=[
+                dict(type='Resize', keep_ratio=True),
+                dict(type='RandomFlip'),
+                dict(type='Normalize', mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True),
+                dict(type='Pad', size_divisor=32),
+                dict(type='ImageToTensor', keys=['img']),
+                dict(type='Collect', keys=['img']),
+            ])
+    ],
+    'test_cfg': dict(
+                nms_pre=200,
+                score_thr=0.1,
+                mask_thr=0.6,
+                update_thr=0.06,
+                kernel='gaussian',  # gaussian/linear
+                sigma=2.0,
+                max_per_img=15),
+
+    'imgs_per_gpu': 4,
+    'workers_per_gpu': 4,
+    'num_gpus': 1,
+    # learning policy
+    'lr_config': dict(policy='step', warmup='linear', warmup_iters=500, warmup_ratio=0.005, step=[35, 60, 80, 90]),
+    #'lr_config': dict(policy='step', warmup='linear', warmup_iters=500, warmup_ratio=0.01, step=[4, 6, 8, 10]),
+    # optimizer
+    'optimizer': dict(type='SGD', lr=0.005, momentum=0.9, weight_decay=0.0001),  
+    'optimizer_config': dict(grad_clip=dict(max_norm=35, norm_type=2)),   #梯度平衡策略
+
+    'resume_from': None,    #从保存的权重文件中读取，如果为None则权重自己初始化
+    'total_epoch': 100,
+    'epoch_iters_start': 1,    #本次训练的开始迭代起始轮数
+})
+
+cfg = solov2_bl_config.copy()
 
 
 def set_cfg(config_name:str):

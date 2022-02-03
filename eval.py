@@ -48,6 +48,8 @@ COCO_CLASSES = ('person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus',
                 'mouse', 'remote', 'keyboard', 'cell phone', 'microwave', 'oven',
                 'toaster', 'sink', 'refrigerator', 'book', 'clock', 'vase',
                 'scissors', 'teddy bear', 'hair drier', 'toothbrush')
+
+
 CLASS_NAMES=(COCO_CLASSES, COCO_LABEL)
 
 def get_masks(result, num_classes=80):
@@ -136,7 +138,7 @@ def show_result_ins(imgAbsPath,
     if isinstance(imgAbsPath, str):
         print(imgAbsPath)
         img = cv.imread(imgAbsPath)
-        img = cv.resize(img, (576, 432))
+        img = cv.resize(img, (512, 512))
     img_show = img.copy()
     h, w, _ = img.shape
 
@@ -263,13 +265,14 @@ def eval(valmodel_weight, data_path, benchmark, test_mode, save_imgs=False):
             imgsinfo = json.load(open(data_path,'r'))
             for i in range(len(imgsinfo['images'])):
                 img_id = imgsinfo['images'][i]['id']
-                img_path = "/home/w/data/MVtec/d2s_images_v1/images/" + imgsinfo['images'][i]['file_name']
+                img_path = imgsinfo['images'][i]['file_name']
                 img_ids.append(img_id)
                 images.append(img_path)
 
         results = []
         k = 0
         for imgpath in images:
+            print(imgpath)
             img_id = img_ids[k]
             data = dict(img=imgpath)
             data = test_pipeline(data)
@@ -279,14 +282,16 @@ def eval(valmodel_weight, data_path, benchmark, test_mode, save_imgs=False):
             img_info = data['img_metas']
             with torch.no_grad():
                 seg_result = model.forward(img=[img], img_meta=[img_info], return_loss=False)
-            img_show = show_result_ins(imgpath,seg_result)
+            if seg_result[0] is None:
+                continue
+            img_show = show_result_ins(imgpath, seg_result)
 
             #cv.imshow("watch windows",img_show)
             #cv.waitKey(1)
-            out_filepath = "results/" + os.path.basename(imgpath)
 
             k += 1
             if save_imgs:
+                out_filepath = "results/" + os.path.basename(imgpath)
                 cv.imwrite(out_filepath, img_show)
             if benchmark == True:
                 result = result2json(img_id, seg_result)
@@ -298,5 +303,5 @@ def eval(valmodel_weight, data_path, benchmark, test_mode, save_imgs=False):
             fjson.write(re_js)
             fjson.close()
 
-eval(valmodel_weight='weights/solov2_resnet34_epoch_99_mvtec.pth',data_path="/home/w/data/MVtec/d2s_annotations_v1.1/annotations/D2S_validation.json", benchmark=False, test_mode="images", save_imgs=True)
+eval(valmodel_weight='weights/solov2_resnet34_epoch_99_bl.pth',data_path="/home/w/data/BL/bl121/labelCOCO/anno.json", benchmark=False, test_mode="images", save_imgs=True)
 #eval(valmodel_weight='pretrained/solov2_448_r18_epoch_36.pth',data_path="cam0.avi", benchmark=False, test_mode="video")

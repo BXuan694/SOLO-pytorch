@@ -159,7 +159,7 @@ def train(globalStartEpoch=1, totalEpoches=36):
             pastIters += 1
             currentIter += 1
 
-            showIters = 100.0
+            showIters = 10
             if j%int(showIters) == 0 and j != 0:
                 iterLastTime = time.time() - iterStartTime
                 left_seconds = iterLastTime * (leftIters-currentIter)
@@ -177,7 +177,7 @@ def train(globalStartEpoch=1, totalEpoches=36):
 
         leftEpoches -= 1
 
-        save_name = "./weights/solov2_" + cfg.backbone.name + "_epoch_" + str(currentEpoch) + "_mvtec.pth"
+        save_name = "./weights/solov2_" + cfg.backbone.name + "_epoch_" + str(currentEpoch) + "_bl.pth"
         model.save_weights(save_name)        
 
 if __name__ == '__main__':
