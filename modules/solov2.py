@@ -137,6 +137,8 @@ class SOLOV2(nn.Module):
             self.backbone = resnet18(pretrained=True, loadpath = cfg.backbone.path)
         elif cfg.backbone.name == 'resnet34':
             self.backbone = resnet34(pretrained=True, loadpath = cfg.backbone.path)
+        elif cfg.backbone.name == 'resnet50':
+            self.backbone = resnet50(pretrained=True, loadpath = cfg.backbone.path)
         else:
             raise NotImplementedError
         

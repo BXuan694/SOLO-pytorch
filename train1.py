@@ -1,7 +1,7 @@
-from data.config import cfg, process_funcs_dict
+from data.config_SOLO_r34_BL import cfg, process_funcs_dict
 from data.coco import CocoDataset
 from data.loader import build_dataloader
-from modules.solov2 import SOLOV2
+from modules.solov1 import SOLOV1
 import time
 import torch
 import numpy as np
@@ -47,7 +47,7 @@ def get_warmup_lr(curIter_, totalIters_, baseLr_, warmupRatio_, warmUpOption='li
     return warmupLr
 
 
-def train(globalStartEpoch=1, totalEpoches=36):
+def train(globalStartEpoch=1, totalEpoches=100):
 
     # train process pipelines func
     trainTransformsPiplines = build_process_pipeline(cfg.train_pipeline)
@@ -60,10 +60,10 @@ def train(globalStartEpoch=1, totalEpoches=36):
     torchdataLoader = build_dataloader(casiadata, cfg.imgs_per_gpu, cfg.workers_per_gpu, num_gpus=cfg.num_gpus, shuffle=True)
 
     if cfg.resume_from is None:
-        model = SOLOV2(cfg, pretrained=None, mode='train')
+        model = SOLOV1(cfg, pretrained=None, mode='train')
         print('cfg.resume_from is None')
     else:
-        model = SOLOV2(cfg, pretrained=cfg.resume_from, mode='train')
+        model = SOLOV1(cfg, pretrained=cfg.resume_from, mode='train')
     model = model.cuda()
     model = model.train()
 
@@ -177,7 +177,7 @@ def train(globalStartEpoch=1, totalEpoches=36):
 
         leftEpoches -= 1
 
-        save_name = "./weights/solov2_" + cfg.backbone.name + "_epoch_" + str(currentEpoch) + "_bl.pth"
+        save_name = "./weights/solo1/" + cfg.backbone.name + "_epoch_" + str(currentEpoch) + "_bl.pth"
         model.save_weights(save_name)        
 
 if __name__ == '__main__':

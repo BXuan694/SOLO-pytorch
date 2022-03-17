@@ -14,10 +14,7 @@ from torch.nn.parallel import DataParallel
 class FPN(nn.Module):
     
     def __init__(self, 
-               in_channels,
-               out_channels,
-               num_outs,
-               start_level=0,
+               cfg,
                end_level=-1,
                add_extra_convs=False,
                extra_convs_on_inputs=True,
@@ -25,24 +22,23 @@ class FPN(nn.Module):
                no_norm_on_lateral=False,
                upsample_cfg=dict(mode='nearest')):
         super(FPN, self).__init__()
-        assert isinstance(in_channels, list)
-        self.in_channels = in_channels  #[64, 128, 256, 512] resnet18
-        self.out_channels = out_channels  #256
-        self.num_ins = len(in_channels)  #4 
-        self.num_outs = num_outs        #5 
+        self.in_channels = cfg.neck.in_channels  #[64, 128, 256, 512] resnet18
+        self.out_channels = cfg.neck.out_channels  #256
+        self.num_ins = len(self.in_channels)  #4 
+        self.num_outs = cfg.neck.num_outs        #5 
+        self.start_level = cfg.neck.start_level
         self.relu_before_extra_convs = relu_before_extra_convs
         self.no_norm_on_lateral = no_norm_on_lateral
         self.upsample_cfg = upsample_cfg.copy()
         if end_level == -1:                  #default -1
             self.backbone_end_level = self.num_ins
-            assert num_outs >= self.num_ins - start_level
+            assert self.num_outs >= self.num_ins - self.start_level
         else:
             # if end_level < inputs, no extra level is allowed
             self.backbone_end_level = end_level
-            assert end_level <= len(in_channels)
-            assert num_outs == end_level - start_level
+            assert end_level <= len(self.in_channels)
+            assert self.num_outs == end_level - self.start_level
   
-        self.start_level = start_level
         self.end_level = end_level
         self.add_extra_convs = add_extra_convs
         assert isinstance(add_extra_convs, (str, bool))
@@ -61,21 +57,21 @@ class FPN(nn.Module):
         self.fpn_convs = nn.ModuleList()
 
         for i in range(self.start_level, self.backbone_end_level):
-            l_conv = nn.Conv2d(in_channels[i], out_channels, kernel_size=1)
-            fpn_conv = nn.Conv2d(out_channels, out_channels, kernel_size=3, padding=1)
+            l_conv = nn.Conv2d(self.in_channels[i], self.out_channels, kernel_size=1)
+            fpn_conv = nn.Conv2d(self.out_channels, self.out_channels, kernel_size=3, padding=1)
             self.lateral_convs.append(l_conv)
             self.fpn_convs.append(fpn_conv)
 
-        extra_levels = num_outs - self.backbone_end_level + self.start_level
+        extra_levels = self.num_outs - self.backbone_end_level + self.start_level
         if self.add_extra_convs and extra_levels >= 1:   #default false
             for i in range(extra_levels):
                 if i == 0 and self.add_extra_convs == 'on_input':
                     in_channels = self.in_channels[self.backbone_end_level - 1]
                 else:
-                    in_channels = out_channels
+                    in_channels = self.out_channels
                 extra_fpn_conv = nn.Conv2d(
                     in_channels,
-                    out_channels,
+                    self.out_channels,
                     3,
                     stride=2,
                     padding=1)
@@ -137,22 +133,22 @@ class SOLOV1(nn.Module):
             self.backbone = resnet18(pretrained=True, loadpath = cfg.backbone.path)
         elif cfg.backbone.name == 'resnet34':
             self.backbone = resnet34(pretrained=True, loadpath = cfg.backbone.path)
+        elif cfg.backbone.name == 'resnet50':
+            self.backbone = resnet50(pretrained=True, loadpath = cfg.backbone.path)
         else:
             raise NotImplementedError
         
         # this set only support resnet18 and resnet34 backbone, 可以根据solo中resent50的配置进行更改，使其支持resnset50的训练，下同
-        self.fpn = FPN(in_channels=[64, 128, 256, 512],out_channels=256,start_level=0,num_outs=5,upsample_cfg=dict(mode='nearest'))
+        self.fpn = FPN(cfg=cfg, upsample_cfg=dict(mode='nearest'))
 
         # this set only support resnet18 and resnet34 backbone
-        self.bbox_head = SOLOv1Head(num_classes=81,
+        self.bbox_head = SOLOv1Head(num_classes=cfg.num_classes,
                             in_channels=256,
                             seg_feat_channels=256,
-                            stacked_convs=2,
+                            stacked_convs=7,
                             strides=[8, 8, 16, 32, 32],
-                            scale_ranges=((1, 56), (28, 112), (56, 224), (112, 448), (224, 896)),
-                            num_grids=[40, 36, 24, 16, 12],
-                            ins_out_channels=128
-                        )
+                            scale_ranges=((1, 96), (48, 192), (96, 384), (192, 768), (384, 2048)),
+                            num_grids=[40, 36, 24, 16, 12]                        )
         
         self.mode = mode
 
@@ -175,13 +171,6 @@ class SOLOV1(nn.Module):
                 m.init_weights()
         else:
             self.fpn.init_weights()
-        
-        # mask feature head
-        if isinstance(self.mask_feat_head, nn.Sequential):
-            for m in self.mask_feat_head:
-                m.init_weights()
-        else:
-            self.mask_feat_head.init_weights()
 
         self.bbox_head.init_weights()
     

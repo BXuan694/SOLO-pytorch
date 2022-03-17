@@ -1,5 +1,5 @@
-from data.config import cfg, process_funcs_dict
-from modules.solov2 import SOLOV2
+from data.config_SOLO_r34_BL import cfg, process_funcs_dict
+from modules.solov1 import SOLOV1
 import time
 import torch
 import pycocotools.mask as mask_util
@@ -179,7 +179,7 @@ def show_result_ins(imgAbsPath,
         im = Image.fromarray(cur_mask*255)
         _, fname = os.path.split(imgAbsPath)
         bname, _ = os.path.splitext(fname)
-        im.save("./results/"+bname+"_"+str(idx)+'_'+str(COCO_LABEL_MAP[COCO_LABEL[cate_label[idx]]])+'_'+str(cate_score[idx])+".jpg")
+        im.save("./results/solo1/"+bname+"_"+str(idx)+'_'+str(COCO_LABEL_MAP[COCO_LABEL[cate_label[idx]]])+'_'+str(cate_score[idx])+".jpg")
         
         if cur_mask.sum() == 0:
             continue
@@ -209,7 +209,7 @@ def eval(valmodel_weight, data_path, benchmark, test_mode, save_imgs=False):
                 dict(type='TestCollect', keys=['img']),
     ]
     transforms_piplines = build_process_pipeline(transforms)
-    Multest = process_funcs_dict['MultiScaleFlipAug'](transforms=transforms_piplines, img_scale=(480, 448), flip=False)
+    Multest = process_funcs_dict['MultiScaleFlipAug'](transforms=transforms_piplines, img_scale=(512, 512), flip=False)
 
     if test_mode == "video":
         test_pipeline.append(LoadImageInfo())
@@ -220,7 +220,7 @@ def eval(valmodel_weight, data_path, benchmark, test_mode, save_imgs=False):
     test_pipeline.append(Multest)
     test_pipeline = Compose(test_pipeline)
 
-    model = SOLOV2(cfg, pretrained=valmodel_weight, mode='test')
+    model = SOLOV1(cfg, pretrained=valmodel_weight, mode='test')
     model = model.cuda()
 
     if test_mode == "video":
@@ -244,7 +244,7 @@ def eval(valmodel_weight, data_path, benchmark, test_mode, save_imgs=False):
             with torch.no_grad():
                 seg_result = model.forward(img=[img], img_meta=[img_info], return_loss=False)
             
-            img_show = show_result_ins(frame[1],seg_result)
+            img_show = show_result_ins(frame[1], seg_result)
             end = time.time()
             print("spend time: ",(end-start))
             cv.imshow("watch windows",img_show)
@@ -291,7 +291,7 @@ def eval(valmodel_weight, data_path, benchmark, test_mode, save_imgs=False):
 
             k += 1
             if save_imgs:
-                out_filepath = "results/" + os.path.basename(imgpath)
+                out_filepath = "results/solo1/" + os.path.basename(imgpath)
                 cv.imwrite(out_filepath, img_show)
             if benchmark == True:
                 result = result2json(img_id, seg_result)
@@ -303,5 +303,5 @@ def eval(valmodel_weight, data_path, benchmark, test_mode, save_imgs=False):
             fjson.write(re_js)
             fjson.close()
 
-eval(valmodel_weight='weights/solov2_resnet34_epoch_99_bl.pth',data_path="/home/w/data/BL/bl121/labelCOCO/anno.json", benchmark=False, test_mode="images", save_imgs=True)
+eval(valmodel_weight='weights/solo1/resnet34_epoch_99_bl.pth', data_path="/home/w/data/BL/bl121/labelCOCO/anno.json", benchmark=False, test_mode="images", save_imgs=True)
 #eval(valmodel_weight='pretrained/solov2_448_r18_epoch_36.pth',data_path="cam0.avi", benchmark=False, test_mode="video")
