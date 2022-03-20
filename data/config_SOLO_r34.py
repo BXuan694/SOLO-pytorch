@@ -1,7 +1,3 @@
-import os
-import numpy as np
-from math import sqrt
-import torch
 from .piplines import LoadImageFromFile, LoadAnnotations, Normalize, DefaultFormatBundle, Collect, TestCollect, Resize, Pad, RandomFlip, MultiScaleFlipAug, ImageToTensor
 
 
@@ -148,59 +144,23 @@ dataset_base = Config({
     # If not specified, this just assumes category ids start at 1 and increase sequentially.
     'label_map': None
 })
-'''
-coco2017_dataset = dataset_base.copy({
-   'name': 'COCO 2017',
 
-    'train_prefix': './data/coco/',
-    'train_info': 'annotations/instances_val2017.json',
-    'trainimg_prefix': 'train2017/',
-    'train_images': './data/coco/',
-
-    'valid_prefix': './data/coco/',
-    'valid_info': 'annotations/instances_val2017.json',
-    'validimg_prefix': 'val2017/',
-    'valid_images': './data/coco/',
-
-    'label_map': COCO_LABEL_MAP
-
-
-})
-'''
-'''
-coco2017_dataset = dataset_base.copy({
-   'name': 'COCO 2017',
-
-    'train_prefix': '/home/w/data/COCO/',
-    'train_info': 'annotations/instances_val2014.json',
-    'trainimg_prefix': 'val2014/',
-    'train_images': '/home/w/data/COCO/',
-
-    'valid_prefix': '/home/w/data/COCO/',
-    'valid_info': 'annotations/instances_val2014.json',
-    'validimg_prefix': 'val2014/',
-    'valid_images': '/home/w/data/COCO/',
-
-    'label_map': COCO_LABEL_MAP
-})
-'''
 coco2017_dataset = dataset_base.copy({
    'name': 'COCO 2017',
 
     'train_prefix': '',
-    'train_info': '/home/w/data/MVtec/d2s_annotations_v1.1/annotations/D2S_validation.json',
-    'trainimg_prefix': '/home/w/data/MVtec/d2s_images_v1/images/',
+    'train_info': '/home/w/data/COCO/annotations/captions_val2014.json',
+    'trainimg_prefix': '/home/w/data/COCO/val2014/',
     'train_images': '',
 
     'valid_prefix': '',
-    'valid_info': '/home/w/data/MVtec/d2s_annotations_v1.1/annotations/D2S_validation.json',
-    'validimg_prefix': '/home/w/data/MVtec/d2s_images_v1/images/',
+    'valid_info': '/home/w/data/COCO/annotations/captions_val2014.json',
+    'validimg_prefix': '/home/w/data/COCO/val2014/',
     'valid_images': '',
 
-    'class_names': MVtec_CLASSES,
-    'label_map': MVtec_LABEL_MAP
+    'class_names': COCO_CLASSES,
+    'label_map': COCO_LABEL_MAP
 })
-
 bl_dataset = dataset_base.copy({
     'name': 'COCO 2017',
 
@@ -217,7 +177,22 @@ bl_dataset = dataset_base.copy({
     'class_names': BL_CLASSES,
     'label_map': BL_LABEL_MAP
 })
+MVtec_dataset = dataset_base.copy({
+   'name': 'mvtec',
 
+    'train_prefix': '',
+    'train_info': '/home/w/data/MVtec/d2s_annotations_v1.1/annotations/D2S_validation.json',
+    'trainimg_prefix': '/home/w/data/MVtec/d2s_images_v1/images/',
+    'train_images': '',
+
+    'valid_prefix': '',
+    'valid_info': '/home/w/data/MVtec/d2s_annotations_v1.1/annotations/D2S_validation.json',
+    'validimg_prefix': '/home/w/data/MVtec/d2s_images_v1/images/',
+    'valid_images': '',
+
+    'class_names': MVtec_CLASSES,
+    'label_map': MVtec_LABEL_MAP
+})
 
 casia_SPT_val = dataset_base.copy({
     'name': 'casia-SPT 2020',
@@ -259,97 +234,53 @@ resnet34_backbone = backbone_base.copy({
     'frozen_stages': 1,
     'out_indices': (0, 1, 2, 3)
 })
+resnet50_backbone = backbone_base.copy({
+    'name': 'resnet50',
+    'path': './pretrained/resnet50-19c8e357.pth',
+    'type': 'ResNetBackbone',
+    'num_stages': 4,
+    'frozen_stages': 1,
+    'out_indices': (0, 1, 2, 3)
+})
 
 # -------------------------- FPN -------------------------- #
-fpn_base = Config({
+neck_base = Config({
     'in_channels': [64, 128, 256, 512],
     'out_channels': 256,
     'start_level': 0,
     'num_outs': 5,
 })
 
+fpn_r34_base = neck_base.copy({
+    'in_channels': [64, 128, 256, 512],
+    'out_channels': 256,
+    'start_level': 0,
+    'num_outs': 5,
+})
+fpn_r50_base = neck_base.copy({
+    'in_channels': [256, 512, 1024, 2048],
+    'out_channels': 256,
+    'start_level': 0,
+    'num_outs': 5,
+})
 
 # ----------------------- CONFIG DEFAULTS ----------------------- #
 base_config = Config({
     'dataset': coco2017_dataset,
-    'num_classes': 81, # This should include the background class
+    'num_classes': -1, # This should include the background class
 })
 
-solov2_mvtec_config = base_config.copy({
-    'name': 'solov2_base',
+solo_bl_r34_config = base_config.copy({
+    'name': 'solo_bl_r34',
     'backbone': resnet34_backbone,
-    # Dataset stuff
-    'dataset': coco2017_dataset,
-    'num_classes': len(coco2017_dataset.class_names) + 1,
-
-
-    'train_pipeline':  [
-        dict(type='LoadImageFromFile'),                                #read img process 
-        dict(type='LoadAnnotations', with_bbox=True, with_mask=True),  #load annotations 
-        dict(type='Resize',                                             #多尺度训练，随即从后面的size选择一个尺寸
-            # img_scale=[(768, 512), (768, 480), (768, 448), (768, 416), (768, 384), (768, 352)],
-            img_scale=[(576, 368), (576, 400), (576, 432), (576, 464), (576, 496)],
-            multiscale_mode='value',
-            keep_ratio=True),
-        dict(type='RandomFlip', flip_ratio=0.5),                    # 随机反转,0.5的概率
-        dict(type='Normalize', mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True),               
-        dict(type='Pad', size_divisor=32),                                #pad另一边的size为32的倍数，solov2对网络输入的尺寸有要求，图像的size需要为32的倍数
-        dict(type='DefaultFormatBundle'),                                #将数据转换为tensor，为后续网络计算
-        dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels', 'gt_masks'], meta_keys=('filename', 'ori_shape', 'img_shape', 'pad_shape',
-                            'scale_factor', 'flip', 'img_norm_cfg')),   
-    ],
-    'test_pipeline': [
-        dict(type='LoadImageFromFile'),
-        dict(
-            type='MultiScaleFlipAug',
-            img_scale=(768, 448),
-            flip=False,
-            transforms=[
-                dict(type='Resize', keep_ratio=True),
-                dict(type='RandomFlip'),
-                dict(type='Normalize', mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True),
-                dict(type='Pad', size_divisor=32),
-                dict(type='ImageToTensor', keys=['img']),
-                dict(type='Collect', keys=['img']),
-            ])
-    ],
-    'test_cfg': dict(
-                nms_pre=200,
-                score_thr=0.1,
-                mask_thr=0.6,
-                update_thr=0.06,
-                kernel='gaussian',  # gaussian/linear
-                sigma=2.0,
-                max_per_img=15),
-
-    'imgs_per_gpu': 4,
-    'workers_per_gpu': 4,
-    'num_gpus': 1,
-    # learning policy
-    'lr_config': dict(policy='step', warmup='linear', warmup_iters=500, warmup_ratio=0.005, step=[35, 60, 80, 90]),
-    #'lr_config': dict(policy='step', warmup='linear', warmup_iters=500, warmup_ratio=0.01, step=[4, 6, 8, 10]),
-    # optimizer
-    'optimizer': dict(type='SGD', lr=0.005, momentum=0.9, weight_decay=0.0001),  
-    'optimizer_config': dict(grad_clip=dict(max_norm=35, norm_type=2)),   #梯度平衡策略
-
-    'resume_from': None,    #从保存的权重文件中读取，如果为None则权重自己初始化
-    'total_epoch': 100,
-    'epoch_iters_start': 1,    #本次训练的开始迭代起始轮数
-})
-
-solov2_bl_config = base_config.copy({
-    'name': 'solov2_base',
-    'backbone': resnet34_backbone,
-    # Dataset stuff
+    'neck': fpn_r34_base,
     'dataset': bl_dataset,
     'num_classes': len(bl_dataset.class_names) + 1,
 
-
     'train_pipeline':  [
         dict(type='LoadImageFromFile'),                                #read img process 
         dict(type='LoadAnnotations', with_bbox=True, with_mask=True),  #load annotations 
         dict(type='Resize',                                             #多尺度训练，随即从后面的size选择一个尺寸
-            # img_scale=[(768, 512), (768, 480), (768, 448), (768, 416), (768, 384), (768, 352)],
             img_scale=[(512, 512)],
             multiscale_mode='value',
             keep_ratio=True),
@@ -364,7 +295,7 @@ solov2_bl_config = base_config.copy({
         dict(type='LoadImageFromFile'),
         dict(
             type='MultiScaleFlipAug',
-            img_scale=(768, 448),
+            img_scale=(512, 512),
             flip=False,
             transforms=[
                 dict(type='Resize', keep_ratio=True),
@@ -398,8 +329,124 @@ solov2_bl_config = base_config.copy({
     'total_epoch': 100,
     'epoch_iters_start': 1,    #本次训练的开始迭代起始轮数
 })
+solo_MVtec_r34_config = base_config.copy({
+    'name': 'solo_MVtec_r34',
+    'backbone': resnet34_backbone,
+    'neck': fpn_r34_base,
+    'dataset': MVtec_dataset,
+    'num_classes': len(MVtec_dataset.class_names) + 1,
 
-cfg = solov2_bl_config.copy()
+    'train_pipeline':  [
+        dict(type='LoadImageFromFile'),                                #read img process 
+        dict(type='LoadAnnotations', with_bbox=True, with_mask=True),  #load annotations 
+        dict(type='Resize',                                             #多尺度训练，随即从后面的size选择一个尺寸
+            img_scale=[(576, 368), (576, 400), (576, 432), (576, 464), (576, 496)],
+            multiscale_mode='value',
+            keep_ratio=True),
+        dict(type='RandomFlip', flip_ratio=0.5),                    # 随机反转,0.5的概率
+        dict(type='Normalize', mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True),               
+        dict(type='Pad', size_divisor=32),                                #pad另一边的size为32的倍数，solov2对网络输入的尺寸有要求，图像的size需要为32的倍数
+        dict(type='DefaultFormatBundle'),                                #将数据转换为tensor，为后续网络计算
+        dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels', 'gt_masks'], meta_keys=('filename', 'ori_shape', 'img_shape', 'pad_shape',
+                            'scale_factor', 'flip', 'img_norm_cfg')),   
+    ],
+    'test_pipeline': [
+        dict(type='LoadImageFromFile'),
+        dict(
+            type='MultiScaleFlipAug',
+            img_scale=(576, 432),
+            flip=False,
+            transforms=[
+                dict(type='Resize', keep_ratio=True),
+                dict(type='RandomFlip'),
+                dict(type='Normalize', mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True),
+                dict(type='Pad', size_divisor=32),
+                dict(type='ImageToTensor', keys=['img']),
+                dict(type='Collect', keys=['img']),
+            ])
+    ],
+    'test_cfg': dict(
+                nms_pre=200,
+                score_thr=0.1,
+                mask_thr=0.6,
+                update_thr=0.06,
+                kernel='gaussian',  # gaussian/linear
+                sigma=2.0,
+                max_per_img=15),
+
+    'imgs_per_gpu': 4,
+    'workers_per_gpu': 4,
+    'num_gpus': 1,
+    # learning policy
+    'lr_config': dict(policy='step', warmup='linear', warmup_iters=500, warmup_ratio=0.005, step=[35, 60, 80, 90]),
+    # optimizer
+    'optimizer': dict(type='SGD', lr=0.005, momentum=0.9, weight_decay=0.0001),  
+    'optimizer_config': dict(grad_clip=dict(max_norm=35, norm_type=2)),   #梯度平衡策略
+
+    'resume_from': None,    #从保存的权重文件中读取，如果为None则权重自己初始化
+    'total_epoch': 100,
+    'epoch_iters_start': 1,    #本次训练的开始迭代起始轮数
+})
+solo_coco_r34_config = base_config.copy({
+    'name': 'solo_coco_r34',
+    'backbone': resnet34_backbone,
+    'neck': fpn_r34_base,
+    'dataset': coco2017_dataset,
+    'num_classes': len(coco2017_dataset.class_names) + 1,
+
+    'train_pipeline':  [
+        dict(type='LoadImageFromFile'),                                #read img process 
+        dict(type='LoadAnnotations', with_bbox=True, with_mask=True),  #load annotations 
+        dict(type='Resize',                                             #多尺度训练，随即从后面的size选择一个尺寸
+            img_scale=[(768, 512), (768, 480), (768, 448), (768, 416), (768, 384), (768, 352)],
+            multiscale_mode='value',
+            keep_ratio=True),
+        dict(type='RandomFlip', flip_ratio=0.5),                    # 随机反转,0.5的概率
+        dict(type='Normalize', mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True),               
+        dict(type='Pad', size_divisor=32),                                #pad另一边的size为32的倍数，solov2对网络输入的尺寸有要求，图像的size需要为32的倍数
+        dict(type='DefaultFormatBundle'),                                #将数据转换为tensor，为后续网络计算
+        dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels', 'gt_masks'], meta_keys=('filename', 'ori_shape', 'img_shape', 'pad_shape',
+                            'scale_factor', 'flip', 'img_norm_cfg')),   
+    ],
+    'test_pipeline': [
+        dict(type='LoadImageFromFile'),
+        dict(
+            type='MultiScaleFlipAug',
+            img_scale=(768, 448),
+            flip=False,
+            transforms=[
+                dict(type='Resize', keep_ratio=True),
+                dict(type='RandomFlip'),
+                dict(type='Normalize', mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True),
+                dict(type='Pad', size_divisor=32),
+                dict(type='ImageToTensor', keys=['img']),
+                dict(type='Collect', keys=['img']),
+            ])
+    ],
+    'test_cfg': dict(
+                nms_pre=200,
+                score_thr=0.1,
+                mask_thr=0.6,
+                update_thr=0.06,
+                kernel='gaussian',  # gaussian/linear
+                sigma=2.0,
+                max_per_img=15),
+
+    'imgs_per_gpu': 4,
+    'workers_per_gpu': 4,
+    'num_gpus': 1,
+    # learning policy
+    'lr_config': dict(policy='step', warmup='linear', warmup_iters=500, warmup_ratio=0.005, step=[35, 60, 80, 90]),
+    # optimizer
+    'optimizer': dict(type='SGD', lr=0.005, momentum=0.9, weight_decay=0.0001),  
+    'optimizer_config': dict(grad_clip=dict(max_norm=35, norm_type=2)),   #梯度平衡策略
+
+    'resume_from': None,    #从保存的权重文件中读取，如果为None则权重自己初始化
+    'total_epoch': 100,
+    'epoch_iters_start': 1,    #本次训练的开始迭代起始轮数
+})
+
+cfg = solo_bl_r34_config.copy()
 
 
 def set_cfg(config_name:str):

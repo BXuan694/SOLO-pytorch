@@ -1,4 +1,4 @@
-from data.config_SOLO_r34_BL import cfg, process_funcs_dict
+from data.config_SOLO_r34 import cfg, process_funcs_dict
 from data.coco import CocoDataset
 from data.loader import build_dataloader
 from modules.solov2 import SOLOV2

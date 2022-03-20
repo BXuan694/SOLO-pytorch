@@ -1,4 +1,4 @@
-from data.config_SOLO_r34_BL import cfg, process_funcs_dict
+from data.config_SOLO_r34 import cfg, process_funcs_dict
 from data.coco import CocoDataset
 from data.loader import build_dataloader
 from modules.solov1 import SOLOV1
@@ -177,7 +177,7 @@ def train(globalStartEpoch=1, totalEpoches=100):
 
         leftEpoches -= 1
 
-        save_name = "./weights/solo1/" + cfg.backbone.name + "_epoch_" + str(currentEpoch) + "_bl.pth"
+        save_name = "./weights/solo1/" + cfg.backbone.name + "_epoch_" + str(currentEpoch) + "_coco.pth"
         model.save_weights(save_name)        
 
 if __name__ == '__main__':

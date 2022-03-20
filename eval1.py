@@ -1,4 +1,4 @@
-from data.config_SOLO_r34_BL import cfg, process_funcs_dict
+from data.config_SOLO_r34 import cfg, process_funcs_dict
 from modules.solov1 import SOLOV1
 import time
 import torch
@@ -209,7 +209,7 @@ def eval(valmodel_weight, data_path, benchmark, test_mode, save_imgs=False):
                 dict(type='TestCollect', keys=['img']),
     ]
     transforms_piplines = build_process_pipeline(transforms)
-    Multest = process_funcs_dict['MultiScaleFlipAug'](transforms=transforms_piplines, img_scale=(512, 512), flip=False)
+    Multest = process_funcs_dict['MultiScaleFlipAug'](transforms=transforms_piplines, img_scale=(768, 448), flip=False)
 
     if test_mode == "video":
         test_pipeline.append(LoadImageInfo())
@@ -265,7 +265,8 @@ def eval(valmodel_weight, data_path, benchmark, test_mode, save_imgs=False):
             imgsinfo = json.load(open(data_path,'r'))
             for i in range(len(imgsinfo['images'])):
                 img_id = imgsinfo['images'][i]['id']
-                img_path = imgsinfo['images'][i]['file_name']
+                img_path = '/home/w/data/MVtec/d2s_images_v1/images/'+imgsinfo['images'][i]['file_name']
+                #                img_path = '/home/w/data/COCO/val2014/'+imgsinfo['images'][i]['file_name']
                 img_ids.append(img_id)
                 images.append(img_path)
 
@@ -303,5 +304,5 @@ def eval(valmodel_weight, data_path, benchmark, test_mode, save_imgs=False):
             fjson.write(re_js)
             fjson.close()
 
-eval(valmodel_weight='weights/solo1/resnet34_epoch_99_bl.pth', data_path="/home/w/data/BL/bl121/labelCOCO/anno.json", benchmark=False, test_mode="images", save_imgs=True)
-#eval(valmodel_weight='pretrained/solov2_448_r18_epoch_36.pth',data_path="cam0.avi", benchmark=False, test_mode="video")
+#eval(valmodel_weight='weights/solo1/resnet34_epoch_99_bl.pth', data_path="/home/w/data/BL/bl121/labelCOCO/anno.json", benchmark=False, test_mode="images", save_imgs=True)
+eval(valmodel_weight='weights/solo1/resnet34_epoch_84_coco.pth',data_path="/home/w/data/MVtec/d2s_annotations_v1.1/annotations/D2S_validation.json", benchmark=False, test_mode="images", save_imgs=True)
