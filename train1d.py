@@ -1,7 +1,7 @@
 from data.config import cfg, process_funcs_dict
 from data.coco import CocoDataset
 from data.loader import build_dataloader
-from modules.solov1 import SOLOV1
+from modules.solov1d import SOLOV1
 import time
 import torch
 import numpy as np

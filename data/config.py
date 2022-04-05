@@ -149,12 +149,12 @@ coco2017_dataset = dataset_base.copy({
    'name': 'COCO 2017',
 
     'train_prefix': '',
-    'train_info': '/home/w/data/COCO/annotations/captions_val2014.json',
+    'train_info': '/home/w/data/COCO/annotations/instances_val2014.json',
     'trainimg_prefix': '/home/w/data/COCO/val2014/',
     'train_images': '',
 
     'valid_prefix': '',
-    'valid_info': '/home/w/data/COCO/annotations/captions_val2014.json',
+    'valid_info': '/home/w/data/COCO/annotations/instances_val2014.json',
     'validimg_prefix': '/home/w/data/COCO/val2014/',
     'valid_images': '',
 
@@ -193,21 +193,21 @@ MVtec_dataset = dataset_base.copy({
     'class_names': MVtec_CLASSES,
     'label_map': MVtec_LABEL_MAP
 })
-
 casia_SPT_val = dataset_base.copy({
     'name': 'casia-SPT 2020',
     
-    'train_prefix': './data/casia-SPT_val/val/',
-    'train_info': 'val_annotation.json',
-    'trainimg_prefix': '',
-    'train_images': './data/casia-SPT_val/val/',
+    'train_prefix': '',
+    'train_info': '/home/w/data/casia-SPT_val/val/val_annotation.json',
+    'trainimg_prefix': '/home/w/data/casia-SPT_val/val/JPEGImages/',
+    'train_images': '',
 
     
-    'valid_prefix': './data/casia-SPT_val/val/',
-    'valid_info': 'val_annotation.json',
-    'validimg_prefix': '',
-    'valid_images': './data/casia-SPT_val/val',
+    'valid_prefix': '',
+    'valid_info': '/home/w/data/casia-SPT_val/val/val_annotation.json',
+    'validimg_prefix': '/home/w/data/casia-SPT_val/val/JPEGImages/',
+    'valid_images': '',
 
+    'class_names': COCO_CLASSES,
     'label_map': COCO_LABEL_MAP
 })
 
@@ -270,10 +270,10 @@ base_config = Config({
     'num_classes': -1, # This should include the background class
 })
 
-solo_bl_r34_config = base_config.copy({
+solo_bl_config = base_config.copy({
     'name': 'solo_bl_r34',
-    'backbone': resnet34_backbone,
-    'neck': fpn_r34_base,
+    'backbone': resnet50_backbone,
+    'neck': fpn_r50_base,
     'dataset': bl_dataset,
     'num_classes': len(bl_dataset.class_names) + 1,
 
@@ -329,17 +329,17 @@ solo_bl_r34_config = base_config.copy({
     'total_epoch': 100,
     'epoch_iters_start': 1,    #本次训练的开始迭代起始轮数
 })
-solo_MVtec_r34_config = base_config.copy({
-    'name': 'solo_MVtec_r34',
-    'backbone': resnet34_backbone,
-    'neck': fpn_r34_base,
+solo_MVtec_config = base_config.copy({
+    'name': 'solo_MVtec_r18',
+    'backbone': resnet50_backbone,
+    'neck': fpn_r50_base,
     'dataset': MVtec_dataset,
     'num_classes': len(MVtec_dataset.class_names) + 1,
 
     'train_pipeline':  [
         dict(type='LoadImageFromFile'),                                #read img process 
         dict(type='LoadAnnotations', with_bbox=True, with_mask=True),  #load annotations 
-        dict(type='Resize',                                             #多尺度训练，随即从后面的size选择一个尺寸
+        dict(type='Resize',                                             #多尺度训练，随机从后面的size选择一个尺寸
             img_scale=[(576, 368), (576, 400), (576, 432), (576, 464), (576, 496)],
             multiscale_mode='value',
             keep_ratio=True),
@@ -387,10 +387,10 @@ solo_MVtec_r34_config = base_config.copy({
     'total_epoch': 100,
     'epoch_iters_start': 1,    #本次训练的开始迭代起始轮数
 })
-solo_coco_r34_config = base_config.copy({
+solo_coco_config = base_config.copy({
     'name': 'solo_coco_r34',
-    'backbone': resnet34_backbone,
-    'neck': fpn_r34_base,
+    'backbone': resnet50_backbone,
+    'neck': fpn_r50_base,
     'dataset': coco2017_dataset,
     'num_classes': len(coco2017_dataset.class_names) + 1,
 
@@ -446,7 +446,7 @@ solo_coco_r34_config = base_config.copy({
     'epoch_iters_start': 1,    #本次训练的开始迭代起始轮数
 })
 
-cfg = solo_bl_r34_config.copy()
+cfg = solo_MVtec_config.copy()
 
 
 def set_cfg(config_name:str):

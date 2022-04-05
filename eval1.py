@@ -1,4 +1,4 @@
-from data.config_SOLO_r34 import cfg, process_funcs_dict
+from data.config import cfg, process_funcs_dict
 from modules.solov1 import SOLOV1
 import time
 import torch
@@ -48,8 +48,6 @@ COCO_CLASSES = ('person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus',
                 'mouse', 'remote', 'keyboard', 'cell phone', 'microwave', 'oven',
                 'toaster', 'sink', 'refrigerator', 'book', 'clock', 'vase',
                 'scissors', 'teddy bear', 'hair drier', 'toothbrush')
-
-
 CLASS_NAMES=(COCO_CLASSES, COCO_LABEL)
 
 def get_masks(result, num_classes=80):
@@ -132,7 +130,7 @@ class LoadImageInfo(object):
 
 def show_result_ins(imgAbsPath,
                     result,
-                    score_thr=0.7,
+                    score_thr=0.5,
                     sort_by_density=False):
 
     if isinstance(imgAbsPath, str):
@@ -265,8 +263,8 @@ def eval(valmodel_weight, data_path, benchmark, test_mode, save_imgs=False):
             imgsinfo = json.load(open(data_path,'r'))
             for i in range(len(imgsinfo['images'])):
                 img_id = imgsinfo['images'][i]['id']
-                img_path = '/home/w/data/MVtec/d2s_images_v1/images/'+imgsinfo['images'][i]['file_name']
-                #                img_path = '/home/w/data/COCO/val2014/'+imgsinfo['images'][i]['file_name']
+                img_path = os.path.join(cfg.dataset.validimg_prefix, imgsinfo['images'][i]['file_name'])
+
                 img_ids.append(img_id)
                 images.append(img_path)
 
@@ -304,5 +302,4 @@ def eval(valmodel_weight, data_path, benchmark, test_mode, save_imgs=False):
             fjson.write(re_js)
             fjson.close()
 
-#eval(valmodel_weight='weights/solo1/resnet34_epoch_99_bl.pth', data_path="/home/w/data/BL/bl121/labelCOCO/anno.json", benchmark=False, test_mode="images", save_imgs=True)
-eval(valmodel_weight='weights/solo1/resnet34_epoch_84_coco.pth',data_path="/home/w/data/MVtec/d2s_annotations_v1.1/annotations/D2S_validation.json", benchmark=False, test_mode="images", save_imgs=True)
+eval(valmodel_weight='weights/solo1/solo_MVtec_r18_epoch_99.pth',data_path="/home/w/data/MVtec/d2s_annotations_v1.1/annotations/D2S_validation.json", benchmark=False, test_mode="images", save_imgs=True)

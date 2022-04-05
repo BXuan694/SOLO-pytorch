@@ -249,6 +249,8 @@ def _resnet(arch, block, layers, pretrained, loadpath, progress, **kwargs):
             model.load_state_dict(state_dict)
         elif arch == 'resnet50':
             state_dict = torch.load(loadpath)
+            del state_dict['fc.weight']
+            del state_dict['fc.bias']
             model.load_state_dict(state_dict)
     return model
 

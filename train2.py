@@ -47,7 +47,7 @@ def get_warmup_lr(curIter_, totalIters_, baseLr_, warmupRatio_, warmUpOption='li
     return warmupLr
 
 
-def train(globalStartEpoch=1, totalEpoches=100):
+def train(globalStartEpoch, totalEpoches):
 
     # train process pipelines func
     trainTransformsPiplines = build_process_pipeline(cfg.train_pipeline)
@@ -162,7 +162,7 @@ def train(globalStartEpoch=1, totalEpoches=100):
             showIters = 10
             if j%int(showIters) == 0 and j != 0:
                 iterLastTime = time.time() - iterStartTime
-                left_seconds = iterLastTime * (leftIters-currentIter)
+                left_seconds = iterLastTime * leftIters
                 left_minutes = left_seconds / 60.0
                 left_hours = left_minutes / 60.0
                 left_days = left_hours // 24
@@ -177,7 +177,7 @@ def train(globalStartEpoch=1, totalEpoches=100):
 
         leftEpoches -= 1
 
-        save_name = "./weights/solo2/" + cfg.backbone.name + "_epoch_" + str(currentEpoch) + "_bl.pth"
+        save_name = "./weights/solo2/" + cfg.name + "_epoch_" + str(currentEpoch) + ".pth"
         model.save_weights(save_name)        
 
 if __name__ == '__main__':

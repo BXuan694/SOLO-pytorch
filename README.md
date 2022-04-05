@@ -1,7 +1,11 @@
 # SOLO-pytorch
 An instance segmentation mathod(https://arxiv.org/abs/1912.04488, https://arxiv.org/abs/2003.10152) without mmdet&mmcv.
 
-res34: tested pass on coco2017-eval and mvtec.
+bakbone of res34&18 have been tested pass on coco2017-val and mvtec datasets.
+
+# Request
+
+python3.7.11, PyTorch1.9.0, torchvision0.10.0
 
 # How to use
 1. build loss
@@ -13,11 +17,9 @@ python setup.py develop
 3. use train1.py/eval1.py for SOLO1 and train2.py/eval2.py for SOLO2
 
 # TODO:
-test res18/50
-
 test solo1-decouple
 
-add video support
+test video support
 
 optimize project structure
 
