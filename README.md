@@ -1,7 +1,7 @@
 # SOLO-pytorch
 An instance segmentation mathod(https://arxiv.org/abs/1912.04488, https://arxiv.org/abs/2003.10152) without mmdet&mmcv.
 
-bakbone of res34&18 have been tested pass on coco2017-val and mvtec datasets.
+Backbone of res50 has been tested pass on coco2017-val, For backbone of res18&34, easier datasets such as MVtec60(https://www.mvtec.com/company/research/datasets/mvtec-d2s) are tested pass.
 
 # Request
 
