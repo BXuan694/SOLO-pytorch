@@ -50,14 +50,11 @@ class SOLOv1DecoupleHead(nn.Module):
                  num_grids=None,  #[40, 36, 24, 16, 12],
                  cate_down_pos=0,
                  with_deform=False,
-                 input_shape = (512, 512),
-                 # ins_out_channels=64,  #128
+                 ins_out_channels=64,  #128
                  loss_ins=None,
                  loss_cate=None,
                  conv_cfg=None,
-                 norm_cfg=None,
-                 use_dcn_in_tower=False,
-                 type_dcn=None):
+                 norm_cfg=None):
         super(SOLOv1DecoupleHead, self).__init__()
         self.num_classes = num_classes
         self.seg_num_grids = num_grids
@@ -67,7 +64,6 @@ class SOLOv1DecoupleHead(nn.Module):
         self.stacked_convs = stacked_convs
         self.strides = strides
         self.sigma = sigma
-        # self.kernel_out_channels = self.ins_out_channels * 1 * 1
         self.cate_down_pos = cate_down_pos # 0
         self.base_edge_list = base_edge_list
         self.scale_ranges = scale_ranges
@@ -75,9 +71,6 @@ class SOLOv1DecoupleHead(nn.Module):
         self.loss_cate = FocalLoss(use_sigmoid=True, gamma=2.0, alpha=0.25, loss_weight=1.0)
         self.ins_loss_weight = 3.0  #loss_ins['loss_weight']  #3.0
         self.norm_cfg = norm_cfg
-        self.use_dcn_in_tower = use_dcn_in_tower
-        self.type_dcn = type_dcn
-        self.input_shape = input_shape
         self._init_layers()
 
     def _init_layers(self):
@@ -317,8 +310,7 @@ class SOLOv1DecoupleHead(nn.Module):
         cate_label_list = []
         ins_ind_label_list = []
         ins_ind_label_list_xy = []
-        for (lower_bound, upper_bound), stride, featmap_size, num_grid \\\\
-                in zip(self.scale_ranges, self.strides, featmap_sizes, self.seg_num_grids):
+        for (lower_bound, upper_bound), stride, featmap_size, num_grid in zip(self.scale_ranges, self.strides, featmap_sizes, self.seg_num_grids):
 
             ins_label = torch.zeros([num_grid**2, featmap_size[0], featmap_size[1]], dtype=torch.uint8, device=device)
             cate_label = torch.zeros([num_grid, num_grid], dtype=torch.int64, device=device)
@@ -526,4 +518,4 @@ class SOLOv1DecoupleHead(nn.Module):
                                size=ori_shape[:2],
                                mode='bilinear').squeeze(0)
         seg_masks = seg_masks > mask_thr
-        return seg_masks, cate_labels, cate_scores"}'
+        return seg_masks, cate_labels, cate_scores

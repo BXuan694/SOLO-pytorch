@@ -3,14 +3,11 @@ import torch.nn as nn
 import torch.nn.functional as F
 from .backbone import resnet18, resnet34, resnet50
 from .nninit import xavier_init
-from .solov1_decouple_head import SOLOv1DecoupleHead
+from .solov1d_head import SOLOv1DecoupleHead
 
 class FPN(nn.Module):
     def __init__(self, 
-               in_channels,
-               out_channels,
-               num_outs,
-               start_level=0,
+               cfg,
                end_level=-1,
                add_extra_convs=False,
                extra_convs_on_inputs=True,
@@ -18,24 +15,23 @@ class FPN(nn.Module):
                no_norm_on_lateral=False,
                upsample_cfg=dict(mode='nearest')):
         super(FPN, self).__init__()
-        assert isinstance(in_channels, list)
-        self.in_channels = in_channels  #[64, 128, 256, 512], outs of resnet18&34
-        self.out_channels = out_channels  #256
-        self.num_ins = len(in_channels)  #4 
-        self.num_outs = num_outs        #5 
+        self.in_channels = cfg.neck.in_channels  #[64, 128, 256, 512] resnet18
+        self.out_channels = cfg.neck.out_channels  #256
+        self.num_ins = len(self.in_channels)  #4 
+        self.num_outs = cfg.neck.num_outs        #5 
+        self.start_level = cfg.neck.start_level
         self.relu_before_extra_convs = relu_before_extra_convs
         self.no_norm_on_lateral = no_norm_on_lateral
         self.upsample_cfg = upsample_cfg.copy()
         if end_level == -1:                  #default -1
             self.backbone_end_level = self.num_ins
-            assert num_outs >= self.num_ins - start_level
+            assert self.num_outs >= self.num_ins - self.start_level
         else:
             # if end_level < inputs, no extra level is allowed
             self.backbone_end_level = end_level
             assert end_level <= len(in_channels)
-            assert num_outs == end_level - start_level
+            assert self.num_outs == end_level - self.start_level
   
-        self.start_level = start_level
         self.end_level = end_level
         self.add_extra_convs = add_extra_convs
         assert isinstance(add_extra_convs, (str, bool))
@@ -54,21 +50,21 @@ class FPN(nn.Module):
         self.fpn_convs = nn.ModuleList()
 
         for i in range(self.start_level, self.backbone_end_level):
-            l_conv = nn.Conv2d(in_channels[i], out_channels, kernel_size=1)
-            fpn_conv = nn.Conv2d(out_channels, out_channels, kernel_size=3, padding=1)
+            l_conv = nn.Conv2d(self.in_channels[i], self.out_channels, kernel_size=1)
+            fpn_conv = nn.Conv2d(self.out_channels, self.out_channels, kernel_size=3, padding=1)
             self.lateral_convs.append(l_conv)
             self.fpn_convs.append(fpn_conv)
 
-        extra_levels = num_outs - self.backbone_end_level + self.start_level
+        extra_levels = self.num_outs - self.backbone_end_level + self.start_level
         if self.add_extra_convs and extra_levels >= 1:   #default false
             for i in range(extra_levels):
                 if i == 0 and self.add_extra_convs == 'on_input':
                     in_channels = self.in_channels[self.backbone_end_level - 1]
                 else:
-                    in_channels = out_channels
+                    in_channels = self.out_channels
                 extra_fpn_conv = nn.Conv2d(
                     in_channels,
-                    out_channels,
+                    self.out_channels,
                     3,
                     stride=2,
                     padding=1)
@@ -121,25 +117,26 @@ class FPN(nn.Module):
         return tuple(outs)
 
 class SOLOV1(nn.Module):
-    def __init__(self, cfg=None, pretrained=None, mode='train', config=None, weights = None):
+    def __init__(self, cfg=None, pretrained=None, mode='train'):
         super(SOLOV1, self).__init__()
-        self.backbone = resnet50(pretrained=True, loadpath=config["backbone"]["path"])
+        if cfg.backbone.name == 'resnet18':
+            self.backbone = resnet18(pretrained=True, loadpath = cfg.backbone.path)
+        elif cfg.backbone.name == 'resnet34':
+            self.backbone = resnet34(pretrained=True, loadpath = cfg.backbone.path)
+        elif cfg.backbone.name == 'resnet50':
+            self.backbone = resnet50(pretrained=True, loadpath = cfg.backbone.path)
+        else:
+            raise NotImplementedError
 
-        # this set only support resnet18 and resnet34 backbone, \\xe5\\x8f\\xaf\\xe4\\xbb\\xa5\\xe6\\xa0\\xb9\\xe6\\x8d\\xaesolo\\xe4\\xb8\\xadresent50\\xe7\\x9a\\x84\\xe9\\x85\\x8d\\xe7\\xbd\\xae\\xe8\\xbf\\x9b\\xe8\\xa1\\x8c\\xe6\\x9b\\xb4\\xe6\\x94\\xb9\\xef\\xbc\\x8c\\xe4\\xbd\\xbf\\xe5\\x85\\xb6\\xe6\\x94\\xaf\\xe6\\x8c\\x81resnset50\\xe7\\x9a\\x84\\xe8\\xae\\xad\\xe7\\xbb\\x83\\xef\\xbc\\x8c\\xe4\\xb8\\x8b\\xe5\\x90\\x8c
-        self.fpn = FPN(in_channels=[256, 512, 1024, 2048], out_channels=256, start_level=0, num_outs=5, upsample_cfg=dict(mode='nearest'))
+        self.fpn = FPN(cfg=cfg, upsample_cfg=dict(mode='nearest'))
     
-        # this set only support resnet18 and resnet34 backbone
-        self.bbox_head = SOLOv1DecoupleHead(num_classes = config["head"]["num_classes"],
-                            in_channels = config["head"]["in_channels"],
-                            seg_feat_channels = config["head"]["seg_feat_channels"],
-                            stacked_convs = config["head"]["stacked_convs"],
-                            strides = config["head"]["strides"],
-                            #scale_ranges=((1, 56), (28, 112), (56, 224), (112, 448), (224, 896)),
-                            scale_ranges = config["head"]["scale_ranges"],
-                            num_grids = config["head"]["num_grids"],
-                            cate_down_pos = config["head"]["cate_down_pos"],
-                            with_deform = config["head"]["with_deform"],
-                            input_shape = (512, 512)
+        self.bbox_head = SOLOv1DecoupleHead(num_classes = cfg.num_classes,
+                            in_channels = 256,
+                            seg_feat_channels = 256,
+                            stacked_convs = 7,
+                            strides = [8, 8, 16, 32, 32],
+                            scale_ranges=((1, 56), (28, 112), (56, 224), (112, 448), (224, 896)),
+                            num_grids = [40, 36, 24, 16, 12],
                         )
         
         self.mode = mode
@@ -151,21 +148,20 @@ class SOLOV1(nn.Module):
             self.kernel = config["test_cfg"]['kernel']
             self.sigma = config["test_cfg"]['sigma']
             self.max_per_img = config["test_cfg"]['max_per_img']
-        self.seg_num_grids = config["head"]['num_grids']
-        self.strides = config["head"]['strides']
-        self.num_classes = config["head"]['num_classes']
+        #self.seg_num_grids = config["head"]['num_grids']
+        #self.strides = config["head"]['strides']
+        #self.num_classes = config["head"]['num_classes']
 
         if self.mode == 'train':
             self.backbone.train(mode=True)
         else:
             self.backbone.train(mode=False)
         
-        if pretrained is None and weights is None:
+        if pretrained is None:
             self.init_weights() #if first train, use this initweight
-        elif pretrained is not None and weights is None:
+        elif pretrained is not None:
             self.load_weights(path=pretrained)
-        elif pretrained is None and weights is not None:
-            self.load_weights(weights=weights)
+
 
     def init_weights(self):
         # fpn

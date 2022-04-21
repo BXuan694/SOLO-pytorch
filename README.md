@@ -10,7 +10,7 @@ python3.7.11, PyTorch1.9.0, torchvision0.10.0
 # How to use
 1. build loss
 ```
-python setup.py develop
+python setup.py build_ext --develop
 ```
 2. set configs like data/config.py
 

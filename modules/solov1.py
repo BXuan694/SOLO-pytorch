@@ -12,7 +12,6 @@ from torch.nn.parallel import DataParallel
 
 
 class FPN(nn.Module):
-    
     def __init__(self, 
                cfg,
                end_level=-1,
@@ -126,7 +125,6 @@ class FPN(nn.Module):
 
 
 class SOLOV1(nn.Module):
-    
     def __init__(self, cfg=None, pretrained=None, mode='train'):
         super(SOLOV1, self).__init__()
         if cfg.backbone.name == 'resnet18':
@@ -138,17 +136,15 @@ class SOLOV1(nn.Module):
         else:
             raise NotImplementedError
         
-        # this set only support resnet18 and resnet34 backbone, 可以根据solo中resent50的配置进行更改，使其支持resnset50的训练，下同
         self.fpn = FPN(cfg=cfg, upsample_cfg=dict(mode='nearest'))
 
-        # this set only support resnet18 and resnet34 backbone
         self.bbox_head = SOLOv1Head(num_classes=cfg.num_classes,
                             in_channels=256,
                             seg_feat_channels=256,
                             stacked_convs=7,
                             strides=[8, 8, 16, 32, 32],
                             scale_ranges=((1, 96), (48, 192), (96, 384), (192, 768), (384, 2048)),
-                            num_grids=[40, 36, 24, 16, 12]                        )
+                            num_grids=[40, 36, 24, 16, 12])
         
         self.mode = mode
 

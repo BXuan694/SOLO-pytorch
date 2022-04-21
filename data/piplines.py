@@ -99,7 +99,7 @@ class LoadAnnotations(object):
 
     def __repr__(self):
         repr_str = self.__class__.__name__
-        repr_str += ('(with_bbox={}, with_label={}, with_mask={})').format(self.with_bbox, self.with_label,self.with_mask)
+        repr_str += '(with_bbox={}, with_label={}, with_mask={})'.format(self.with_bbox, self.with_label, self.with_mask)
         return repr_str
 
 class Normalize(object):

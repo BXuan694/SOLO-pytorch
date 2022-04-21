@@ -516,7 +516,6 @@ class SOLOv1Head(nn.Module):
             grid_order_list.append(grid_order)
         return ins_label_list, cate_label_list, ins_ind_label_list, grid_order_list
 
-
     def get_seg_(self, cate_preds, seg_pred, img_metas, cfg, rescale=None):
         num_levels = len(cate_preds)
         featmap_size = seg_pred.size()[-2:]

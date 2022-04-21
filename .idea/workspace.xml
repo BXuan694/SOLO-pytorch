@@ -5,217 +5,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b3cca656-de85-43ef-b7dd-da4513fe4719" name="变更" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/Submission format.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/results_eg/instances_fakesegm_results_eg.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00003.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00005.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00010.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00012.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00013.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00016.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00018.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00019.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00021.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00022.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00024.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00026.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00030.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00031.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00034.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00035.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00037.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00038.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00042.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00045.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00051.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00054.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00064.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00066.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00067.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00068.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00074.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00075.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00076.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00077.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00078.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00079.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00080.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00081.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00084.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00085.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00091.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00092.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00096.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00097.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00098.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00104.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00106.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00108.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00109.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00113.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00115.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00118.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00120.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00121.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00122.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00123.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00124.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00125.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00126.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00128.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00130.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00131.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00132.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00134.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00135.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00136.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00139.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00141.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00144.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00146.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00148.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00152.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00153.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00158.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00163.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00164.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00166.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00167.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00168.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00169.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00170.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00177.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00178.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00180.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00182.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00183.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00186.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00187.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00188.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00189.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00190.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00191.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00193.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00196.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00199.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00201.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00202.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00206.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00208.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00209.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00210.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00211.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00212.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00214.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00215.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00216.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00217.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00219.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00220.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00221.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00222.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00223.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00224.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00225.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00226.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00228.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00230.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00231.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00234.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00237.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00238.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00239.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00318.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00324.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00327.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00334.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00337.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00339.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00352.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00360.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00369.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00377.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00382.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00393.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00414.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00429.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00436.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00456.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00459.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00465.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00484.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00502.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00509.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00537.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00539.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00551.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00561.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00571.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00572.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00574.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00587.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00591.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00596.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00610.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00628.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00629.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00637.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00654.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00656.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00663.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00685.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00692.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00693.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00705.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00725.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00726.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00737.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00748.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00754.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00761.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00774.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00777.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00784.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00785.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00797.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00806.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00808.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00817.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00827.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00838.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00876.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00883.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00884.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00903.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00910.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00914.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00920.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00930.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00934.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00942.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00955.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00956.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/00969.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/01002.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/01010.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/01014.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/01017.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/01025.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/01026.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/01035.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/01073.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/01099.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/01104.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/JPEGImages/01116.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/casia-SPT_val/val/val_annotation.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/config_SOLO_r34.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/eval1.py" beforeDir="false" afterPath="$PROJECT_DIR$/eval1.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/eval2.py" beforeDir="false" afterPath="$PROJECT_DIR$/eval2.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modules/backbone.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/backbone.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/train1.py" beforeDir="false" afterPath="$PROJECT_DIR$/train1.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/train2.py" beforeDir="false" afterPath="$PROJECT_DIR$/train2.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/piplines.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/piplines.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/eval1.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/eval2.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/solov1.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/solov1.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/solov1_head.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/solov1_head.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/solov1d.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/solov1d.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/solov1d_head.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/solov1d_head.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/train1.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/train1d.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/train2.py" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -226,12 +28,11 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="file://$PROJECT_DIR$/train1.py" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/modules/solov2_head.py" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/modules/solov1_head.py" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/data/coco.py" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/modules/solov2.py" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/modules/solov1.py" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/modules/solov1_head.py" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/modules/solov2.py" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/modules/solov2_head.py" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -244,17 +45,20 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">
-    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
-    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="settings.editor.selected.configurable" value="reference.idesettings.debugger.python" />
-  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "last_opened_file_path": "/home/w/exp/insSeg/SOLO-pytorch",
+    "settings.editor.selected.configurable": "Errors"
+  }
+}]]></component>
   <component name="PyDebuggerOptionsProvider">
     <option name="mySupportGeventDebugging" value="true" />
   </component>
-  <component name="RunManager" selected="Python.eval1">
-    <configuration name="eval1" type="PythonConfigurationType" factoryName="Python">
+  <component name="RunManager" selected="Python.train">
+    <configuration name="eval" type="PythonConfigurationType" factoryName="Python">
+      <module name="SOLO-pytorch" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -265,8 +69,7 @@
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/eval1.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/eval.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -275,7 +78,8 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="eval2" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+    <configuration name="train" type="PythonConfigurationType" factoryName="Python">
+      <module name="SOLO-pytorch" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -286,50 +90,7 @@
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/eval2.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="train1" type="PythonConfigurationType" factoryName="Python">
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="$USER_HOME$/miniconda3/envs/cv/bin/python" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/train1.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="train2" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="$USER_HOME$/miniconda3/envs/cv/bin/python" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/train2.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/train.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -339,10 +100,8 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Python.eval2" />
-      <item itemvalue="Python.eval1" />
-      <item itemvalue="Python.train2" />
-      <item itemvalue="Python.train1" />
+      <item itemvalue="Python.eval" />
+      <item itemvalue="Python.train" />
     </list>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="应用程序级" UseSingleDictionary="true" transferred="true" />
@@ -360,18 +119,9 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/train1.py</url>
-          <line>143</line>
-          <option name="timeStamp" value="21" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/modules/solov1_head.py</url>
-          <line>686</line>
+          <line>685</line>
           <option name="timeStamp" value="23" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/eval1.py</url>
-          <option name="timeStamp" value="26" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/modules/backbone.py</url>
@@ -383,10 +133,15 @@
           <line>253</line>
           <option name="timeStamp" value="28" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/modules/solov1_head.py</url>
+          <line>24</line>
+          <option name="timeStamp" value="29" />
+        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
     <watches-manager>
-      <inline-watch fileUrl="file://$PROJECT_DIR$/train1.py" line="110">
+      <inline-watch fileUrl="file://$PROJECT_DIR$/train1.py" line="111">
         <watch expression="data" language="Python" />
       </inline-watch>
     </watches-manager>
