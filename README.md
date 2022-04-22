@@ -12,9 +12,12 @@ python3.7.11, PyTorch1.9.0, torchvision0.10.0
 ```
 python setup.py build_ext --develop
 ```
-2. set configs like data/config.py
 
-3. use train1.py/eval1.py for SOLO1 and train2.py/eval2.py for SOLO2
+2. prepare data as COCO format
+
+3. set configs like data/config.py
+
+4. use train1.py/eval1.py for SOLO1 and train2.py/eval2.py for SOLO2
 
 # TODO:
 test solo1-decouple
