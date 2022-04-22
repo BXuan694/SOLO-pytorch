@@ -17,7 +17,7 @@ python setup.py build_ext --develop
 
 3. set configs like data/config.py
 
-4. use train1.py/eval1.py for SOLO1 and train2.py/eval2.py for SOLO2
+4. select SOLOv1/SOLOv2 in the beginning of train.py/eval.py
 
 # TODO:
 test solo1-decouple
