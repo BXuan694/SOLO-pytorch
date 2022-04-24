@@ -1,7 +1,7 @@
 from data.config import cfg, process_funcs_dict
 from data.coco import CocoDataset
 from data.loader import build_dataloader
-# from modules.solov1 import SOLOV1 as solo
+#from modules.solov1 import SOLOV1 as solo
 # from modules.solov2 import SOLOV2 as solo
 from modules.solov1d import SOLOV1 as solo
 import time

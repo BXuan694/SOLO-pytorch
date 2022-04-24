@@ -1,7 +1,7 @@
 from data.config import cfg, process_funcs_dict
-from modules.solov1 import SOLOV1 as solo
+#from modules.solov1 import SOLOV1 as solo
 # from modules.solov2 import SOLOV2 as solo
-# from modules.solov1d import SOLOV1 as solo
+from modules.solov1d import SOLOV1 as solo
 import time
 import torch
 import pycocotools.mask as mask_util
@@ -292,7 +292,7 @@ def eval(valmodel_weight, data_path, benchmark, test_mode, save_imgs=False):
 
             k += 1
             if save_imgs:
-                out_filepath = "results/solo1/" + os.path.basename(imgpath)
+                out_filepath = "results/" + os.path.basename(imgpath)
                 cv.imwrite(out_filepath, img_show)
             if benchmark == True:
                 result = result2json(img_id, seg_result)
@@ -304,4 +304,4 @@ def eval(valmodel_weight, data_path, benchmark, test_mode, save_imgs=False):
             fjson.write(re_js)
             fjson.close()
 
-eval(valmodel_weight='weights/solo1/solo_MVtec_r18_epoch_99.pth',data_path="/home/w/data/MVtec/d2s_annotations_v1.1/annotations/D2S_validation.json", benchmark=False, test_mode="images", save_imgs=True)
+eval(valmodel_weight='weights/solo1/solo_MVtec_r18_epoch_75.pth',data_path="/home/w/data/MVtec/d2s_annotations_v1.1/annotations/D2S_validation.json", benchmark=False, test_mode="images", save_imgs=True)

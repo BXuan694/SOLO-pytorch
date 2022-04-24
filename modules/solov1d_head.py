@@ -42,12 +42,12 @@ class SOLOv1DecoupleHead(nn.Module):
                  num_classes,  #81 coco datashet
                  in_channels,  # 256 fpn outputs
                  seg_feat_channels=256,   #seg feature channels 
-                 stacked_convs=7,        #solov1 light set 2, \\xe9\\x81\\xb5\\xe5\\xbe\\xaa\\xe8\\xae\\xba\\xe6\\x96\\x87\\xe5\\x92\\x8c\\xe5\\x8e\\x9f\\xe7\\x89\\x88\\xe9\\x85\\x8d\\xe7\\xbd\\xae\\xe6\\x96\\x87\\xe4\\xbb\\xb6
-                 strides=(4, 8, 16, 32, 64),  # [8, 8, 16, 32, 32],
+                 stacked_convs=7,        #solov1 light set 2, 遵循论文和原版配置文件
+                 strides=(8, 8, 16, 32, 32),
                  base_edge_list=(16, 32, 64, 128, 256),
                  scale_ranges=((8, 32), (16, 64), (32, 128), (64, 256), (128, 512)),
-                 sigma=0.2, # \\xe9\\x81\\xb5\\xe5\\xbe\\xaa\\xe5\\x8e\\x9f\\xe7\\x89\\x88\\xe7\\x9a\\x84\\xe9\\x85\\x8d\\xe7\\xbd\\xae\\xe6\\x96\\x87\\xe4\\xbb\\xb6
-                 num_grids=None,  #[40, 36, 24, 16, 12],
+                 sigma=0.2,
+                 num_grids=[40, 36, 24, 16, 12],
                  cate_down_pos=0,
                  with_deform=False,
                  ins_out_channels=64,  #128
@@ -75,9 +75,9 @@ class SOLOv1DecoupleHead(nn.Module):
 
     def _init_layers(self):
         norm_cfg = dict(type='GN', num_groups=32, requires_grad=True)
+        self.cate_convs = nn.ModuleList()
         self.ins_convs_x = nn.ModuleList()
         self.ins_convs_y = nn.ModuleList()
-        self.cate_convs = nn.ModuleList()
         for i in range(self.stacked_convs):
             chn = self.in_channels + 1 if i == 0 else self.seg_feat_channels
             self.ins_convs_x.append(
@@ -108,7 +108,7 @@ class SOLOv1DecoupleHead(nn.Module):
 
                     nn.GroupNorm(num_channels=self.seg_feat_channels,
                     num_groups=32),
-                    
+
                     nn.ReLU(inplace=True)
                 )
             )
@@ -129,19 +129,16 @@ class SOLOv1DecoupleHead(nn.Module):
                 nn.ReLU(inplace=True)
                 )
             )
-        # fpn\\xe7\\x9a\\x84\\xe6\\x89\\x80\\xe6\\x9c\\x895\\xe4\\xb8\\xaa\\xe5\\x88\\x86\\xe6\\x94\\xaf\\xe7\\x9a\\x84mask\\xe8\\xbe\\x93\\xe5\\x87\\xba\\xe5\\xb1\\x82\\xe9\\x9b\\x86\\xe5\\x90\\x88\\xef\\xbc\\x8c\\xe9\\x99\\xa4\\xe4\\xba\\x86\\xe8\\xbf\\x99\\xe4\\xb8\\xaa\\xe6\\x9c\\x80\\xe5\\x90\\x8e\\xe4\\xb8\\x80\\xe5\\xb1\\x82\\xe4\\xb9\\x8b\\xe5\\xa4\\x96\\xef\\xbc\\x8c\\xe5\\x88\\xab\\xe7\\x9a\\x84\\xe5\\xb1\\x82\\xe9\\x83\\xbd\\xe6\\x98\\xaf\\xe5\\x90\\x84\\xe9\\x87\\x91\\xe5\\xad\\x97\\xe5\\xa1\\x94\\xe5\\xb1\\x82\\xe5\\x85\\xb1\\xe4\\xba\\xab\\xe7\\x9a\\x84
         self.dsolo_ins_list_x = nn.ModuleList()
         self.dsolo_ins_list_y = nn.ModuleList()
         for seg_num_grid in self.seg_num_grids:
             self.dsolo_ins_list_x.append(
-                nn.Conv2d(
-                    self.seg_feat_channels, seg_num_grid, 3, padding=1))
+                nn.Conv2d(self.seg_feat_channels, seg_num_grid, 3, padding=1)
+            )
             self.dsolo_ins_list_y.append(
-                nn.Conv2d(
-                    self.seg_feat_channels, seg_num_grid, 3, padding=1))
-        # \\xe5\\x88\\x86\\xe7\\xb1\\xbb\\xe8\\xbe\\x93\\xe5\\x87\\xba\\xe5\\xb1\\x82
+                nn.Conv2d(self.seg_feat_channels, seg_num_grid, 3, padding=1)
+            )
         self.solo_cate = nn.Conv2d(self.seg_feat_channels, self.cate_out_channels, 3, padding=1)
-
 
     def init_weights(self):
         for m in self.ins_convs_x:
@@ -160,13 +157,12 @@ class SOLOv1DecoupleHead(nn.Module):
                 for con in m:
                     if isinstance(con, nn.Conv2d):
                         normal_init(con, std=0.01)
-        
+
         bias_ins = bias_init_with_prob(0.01)
         for m in self.dsolo_ins_list_x:
             normal_init(m, std=0.01, bias=bias_ins)
         for m in self.dsolo_ins_list_y:
             normal_init(m, std=0.01, bias=bias_ins)
-
         bias_cate = bias_init_with_prob(0.01)
         normal_init(self.solo_cate, std=0.01, bias=bias_cate)
 
@@ -187,19 +183,17 @@ class SOLOv1DecoupleHead(nn.Module):
                 F.interpolate(feats[4], size=feats[3].shape[-2:], mode='bilinear', align_corners=False))
 
     def forward_single(self, x, idx, eval=False, upsampled_size=None):
-        # [B, 256\\xef\\xbc\\x8c H\\xef\\xbc\\x8c W]
         ins_feat = x
         cate_feat = x
-
-        # \\xe5\\x88\\x86\\xe5\\x89\\xb2\\xe5\\x88\\x86\\xe6\\x94\\xaf
-        # \\xe5\\x8a\\xa0\\xe5\\x85\\xa5\\xe5\\x9d\\x90\\xe6\\xa0\\x87
+        # ins branch
+        # concat coord
         x_range = torch.linspace(-1, 1, ins_feat.shape[-1], device=ins_feat.device)
         y_range = torch.linspace(-1, 1, ins_feat.shape[-2], device=ins_feat.device)
         y, x = torch.meshgrid(y_range, x_range)
         y = y.expand([ins_feat.shape[0], 1, -1, -1])
         x = x.expand([ins_feat.shape[0], 1, -1, -1])
         ins_feat_x = torch.cat([ins_feat, x], 1)
-        ins_feat_y = torch.cat([ins_feat, y], 1) # [B, 257\\xef\\xbc\\x8c H\\xef\\xbc\\x8c W]
+        ins_feat_y = torch.cat([ins_feat, y], 1)
 
         for ins_layer_x, ins_layer_y in zip(self.ins_convs_x, self.ins_convs_y):
             ins_feat_x = ins_layer_x(ins_feat_x)
@@ -211,13 +205,14 @@ class SOLOv1DecoupleHead(nn.Module):
         ins_pred_x = self.dsolo_ins_list_x[idx](ins_feat_x)
         ins_pred_y = self.dsolo_ins_list_y[idx](ins_feat_y)
 
-        # \\xe5\\x88\\x86\\xe7\\xb1\\xbb\\xe5\\x88\\x86\\xe6\\x94\\xaf
+        # cate branch
         # cate_feat = cate_feat.contiguous()
         for i, cate_layer in enumerate(self.cate_convs):
-            if i == self.cate_down_pos: # \\xe5\\xaf\\xb9\\xe7\\xac\\xac0\\xe5\\xb1\\x82\\xe7\\x9a\\x84feature\\xe5\\x81\\x9a\\xe6\\x8f\\x92\\xe5\\x80\\xbcresize
+            if i == self.cate_down_pos:
                 seg_num_grid = self.seg_num_grids[idx]
                 cate_feat = F.interpolate(cate_feat, size=seg_num_grid, mode='bilinear')
             cate_feat = cate_layer(cate_feat)
+
         cate_pred = self.solo_cate(cate_feat)
 
         if eval:
@@ -237,8 +232,7 @@ class SOLOv1DecoupleHead(nn.Module):
              cfg = None,
              gt_bboxes_ignore=None):
 
-        featmap_sizes = [featmap.size()[-2:] for featmap in
-                         ins_preds_x]
+        featmap_sizes = [featmap.size()[-2:] for featmap in ins_preds_x]
         ins_label_list, cate_label_list, ins_ind_label_list, ins_ind_label_list_xy = multi_apply(
             self.solo_target_single,
             gt_bbox_list,
@@ -253,10 +247,8 @@ class SOLOv1DecoupleHead(nn.Module):
                       for ins_labels_level, ins_ind_labels_level in zip(zip(*ins_label_list), zip(*ins_ind_label_list))]
 
         ins_preds_x_final = [torch.cat([ins_preds_level_img_x[ins_ind_labels_level_img[:, 1], ...]
-                                for ins_preds_level_img_x, ins_ind_labels_level_img in
-                                zip(ins_preds_level_x, ins_ind_labels_level)], 0)
-                     for ins_preds_level_x, ins_ind_labels_level in
-                     zip(ins_preds_x, zip(*ins_ind_label_list_xy))]
+                                for ins_preds_level_img_x, ins_ind_labels_level_img in zip(ins_preds_level_x, ins_ind_labels_level)], 0)
+                     for ins_preds_level_x, ins_ind_labels_level in zip(ins_preds_x, zip(*ins_ind_label_list_xy))]
 
         ins_preds_y_final = [torch.cat([ins_preds_level_img_y[ins_ind_labels_level_img[:, 0], ...]
                                   for ins_preds_level_img_y, ins_ind_labels_level_img in
@@ -274,8 +266,8 @@ class SOLOv1DecoupleHead(nn.Module):
             num_ins += mask_n
             input = (input_x.sigmoid())*(input_y.sigmoid())
             loss_ins.append(dice_loss(input, target))
-
-        loss_ins = torch.cat(loss_ins).mean() * self.ins_loss_weight
+        loss_ins = torch.cat(loss_ins).mean()
+        loss_ins = loss_ins * self.ins_loss_weight
 
         # cate
         cate_labels = [
@@ -292,9 +284,7 @@ class SOLOv1DecoupleHead(nn.Module):
         flatten_cate_preds = torch.cat(cate_preds)
 
         loss_cate = self.loss_cate(flatten_cate_preds, flatten_cate_labels, avg_factor=num_ins + 1)
-        return dict(
-            loss_ins=loss_ins,
-            loss_cate=loss_cate)
+        return dict(loss_ins=loss_ins, loss_cate=loss_cate)
 
     def solo_target_single(self,
                                gt_bboxes_raw,
@@ -303,21 +293,23 @@ class SOLOv1DecoupleHead(nn.Module):
                                featmap_sizes=None):
 
         device = gt_labels_raw[0].device
+
         # ins
         gt_areas = torch.sqrt((gt_bboxes_raw[:, 2] - gt_bboxes_raw[:, 0]) * (
                 gt_bboxes_raw[:, 3] - gt_bboxes_raw[:, 1]))
+
         ins_label_list = []
         cate_label_list = []
         ins_ind_label_list = []
         ins_ind_label_list_xy = []
-        for (lower_bound, upper_bound), stride, featmap_size, num_grid in zip(self.scale_ranges, self.strides, featmap_sizes, self.seg_num_grids):
+        for (lower_bound, upper_bound), stride, featmap_size, num_grid \
+                in zip(self.scale_ranges, self.strides, featmap_sizes, self.seg_num_grids):
 
-            ins_label = torch.zeros([num_grid**2, featmap_size[0], featmap_size[1]], dtype=torch.uint8, device=device)
+            ins_label = torch.zeros([num_grid ** 2, featmap_size[0], featmap_size[1]], dtype=torch.uint8, device=device)
             cate_label = torch.zeros([num_grid, num_grid], dtype=torch.int64, device=device)
-            ins_ind_label = torch.zeros([num_grid**2], dtype=torch.bool, device=device)
+            ins_ind_label = torch.zeros([num_grid ** 2], dtype=torch.bool, device=device)
 
             hit_indices = ((gt_areas >= lower_bound) & (gt_areas <= upper_bound)).nonzero().flatten()
-
             if len(hit_indices) == 0:
                 ins_label = torch.zeros([1, featmap_size[0], featmap_size[1]], dtype=torch.uint8,
                                         device=device)
@@ -368,21 +360,16 @@ class SOLOv1DecoupleHead(nn.Module):
                         label = int(i * num_grid + j)
                         ins_label[label, :seg_mask.shape[0], :seg_mask.shape[1]] = seg_mask
                         ins_ind_label[label] = True
-
             ins_label = ins_label[ins_ind_label]
             ins_label_list.append(ins_label)
 
             cate_label_list.append(cate_label)
-
             ins_ind_label = ins_ind_label[ins_ind_label]
             ins_ind_label_list.append(ins_ind_label)
-
             ins_ind_label_list_xy.append(cate_label.nonzero())
         return ins_label_list, cate_label_list, ins_ind_label_list, ins_ind_label_list_xy
 
-    def get_seg(self, seg_preds_x, seg_preds_y, cate_preds, img_metas, 
-            nms_pre, score_thr,mask_thr, update_thr, kernel, sigma, max_per_img,
-            rescale=None):
+    def get_seg(self, seg_preds_x, seg_preds_y, cate_preds, img_metas, cfg, rescale=None):
         assert len(seg_preds_x) == len(cate_preds)
         num_levels = len(cate_preds)
         featmap_size = seg_preds_x[0].size()[-2:]
@@ -407,12 +394,9 @@ class SOLOv1DecoupleHead(nn.Module):
             seg_pred_list_y = torch.cat(seg_pred_list_y, dim=0)
 
             result = self.get_seg_single(cate_pred_list, seg_pred_list_x, seg_pred_list_y,
-                                         featmap_size, img_shape, ori_shape, scale_factor,
-                                         nms_pre, score_thr,mask_thr, update_thr, kernel, sigma, max_per_img, 
-                                         rescale)
+                                         featmap_size, img_shape, ori_shape, scale_factor, cfg, rescale)
             result_list.append(result)
         return result_list
-
 
     def get_seg_single(self,
                        cate_preds,
@@ -422,7 +406,7 @@ class SOLOv1DecoupleHead(nn.Module):
                        img_shape,
                        ori_shape,
                        scale_factor,
-                       nms_pre, score_thr,mask_thr, update_thr, kernel, sigma, max_per_img, 
+                       cfg,
                        rescale=False, debug=False):
 
         # overall info.
@@ -450,11 +434,12 @@ class SOLOv1DecoupleHead(nn.Module):
             strides[trans_size[ind_ - 1]:trans_size[ind_]] *= self.strides[ind_]
 
         # process.
-        AAA = cate_preds.cpu().numpy()
-        inds = (cate_preds > score_thr)
+        inds = (cate_preds > cfg['score_thr'])
+        # category scores.
         cate_scores = cate_preds[inds]
-
-
+        if len(cate_scores) == 0:
+            return None
+        # category labels.
         inds = inds.nonzero()
         trans_diff = torch.index_select(trans_diff, dim=0, index=inds[:, 0])
         seg_diff = torch.index_select(seg_diff, dim=0, index=inds[:, 0])
@@ -466,56 +451,62 @@ class SOLOv1DecoupleHead(nn.Module):
         x_inds += seg_diff
 
         cate_labels = inds[:, 1]
-        seg_masks_soft = seg_preds_x[x_inds, ...] * seg_preds_y[y_inds, ...]
-        aaa = seg_masks_soft.cpu().numpy()
-        seg_masks = seg_masks_soft > mask_thr
-
+        seg_preds = seg_preds_x[x_inds, ...] * seg_preds_y[y_inds, ...]
+        seg_masks = seg_preds > cfg['mask_thr']
         sum_masks = seg_masks.sum((1, 2)).float()
-        keep = sum_masks > strides
 
-        seg_masks_soft = seg_masks_soft[keep, ...]
+        # filter.
+        keep = sum_masks > strides
+        if keep.sum() == 0:
+            return None
+
         seg_masks = seg_masks[keep, ...]
-        cate_scores = cate_scores[keep]
+        seg_preds = seg_preds[keep, ...]
         sum_masks = sum_masks[keep]
+        cate_scores = cate_scores[keep]
         cate_labels = cate_labels[keep]
+
         # maskness
-        seg_score = (seg_masks_soft * seg_masks.float()).sum((1, 2)) / sum_masks
-        cate_scores *= seg_score
+        seg_scores = (seg_preds * seg_masks.float()).sum((1, 2)) / sum_masks
+        cate_scores *= seg_scores
 
         if len(cate_scores) == 0:
             return None
 
         # sort and keep top nms_pre
         sort_inds = torch.argsort(cate_scores, descending=True)
-        if len(sort_inds) > nms_pre:
-            sort_inds = sort_inds[:nms_pre]
-        seg_masks_soft = seg_masks_soft[sort_inds, :, :]
+        if len(sort_inds) > cfg['nms_pre']:
+            sort_inds = sort_inds[:cfg['nms_pre']]
         seg_masks = seg_masks[sort_inds, :, :]
-        cate_scores = cate_scores[sort_inds]
+        seg_preds = seg_preds[sort_inds, :, :]
         sum_masks = sum_masks[sort_inds]
+        cate_scores = cate_scores[sort_inds]
         cate_labels = cate_labels[sort_inds]
 
         # Matrix NMS
         cate_scores = matrix_nms(seg_masks, cate_labels, cate_scores,
-                                 kernel=kernel, sigma=sigma, sum_masks=sum_masks)
+                                 kernel=cfg['kernel'], sigma=cfg['sigma'], sum_masks=sum_masks)
 
-        keep = cate_scores >= update_thr
-        seg_masks_soft = seg_masks_soft[keep, :, :]
+        keep = cate_scores >= cfg['update_thr']
+        if keep.sum() == 0:
+            return None
+        seg_preds = seg_preds[keep, :, :]
         cate_scores = cate_scores[keep]
         cate_labels = cate_labels[keep]
+
         # sort and keep top_k
         sort_inds = torch.argsort(cate_scores, descending=True)
-        if len(sort_inds) > max_per_img:
-            sort_inds = sort_inds[:max_per_img]
-        seg_masks_soft = seg_masks_soft[sort_inds, :, :]
+        if len(sort_inds) > cfg['max_per_img']:
+            sort_inds = sort_inds[:cfg['max_per_img']]
+        seg_preds = seg_preds[sort_inds, :, :]
         cate_scores = cate_scores[sort_inds]
         cate_labels = cate_labels[sort_inds]
 
-        seg_masks_soft = F.interpolate(seg_masks_soft.unsqueeze(0),
-                                    size=upsampled_size_out,
-                                    mode='bilinear')[:, :, :h, :w]
-        seg_masks = F.interpolate(seg_masks_soft,
-                               size=ori_shape[:2],
-                               mode='bilinear').squeeze(0)
-        seg_masks = seg_masks > mask_thr
+        seg_preds = F.interpolate(seg_preds.unsqueeze(0),
+                                  size=upsampled_size_out,
+                                  mode='bilinear')[:, :, :h, :w]
+        seg_masks = F.interpolate(seg_preds,
+                                  size=ori_shape[:2],
+                                  mode='bilinear').squeeze(0)
+        seg_masks = seg_masks > cfg['mask_thr']
         return seg_masks, cate_labels, cate_scores

@@ -5,19 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b3cca656-de85-43ef-b7dd-da4513fe4719" name="变更" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/piplines.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/piplines.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/eval1.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/eval2.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/config.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/eval.py" beforeDir="false" afterPath="$PROJECT_DIR$/eval.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modules/solov1.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/solov1.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modules/solov1_head.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/solov1_head.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modules/solov1d.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/solov1d.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modules/solov1d_head.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/solov1d_head.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/train1.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/train1d.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/train2.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/train.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -45,14 +40,14 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "last_opened_file_path": "/home/w/exp/insSeg/SOLO-pytorch",
-    "settings.editor.selected.configurable": "Errors"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/w/exp/insSeg/SOLO-pytorch&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;Errors&quot;
   }
-}]]></component>
+}</component>
   <component name="PyDebuggerOptionsProvider">
     <option name="mySupportGeventDebugging" value="true" />
   </component>
@@ -120,7 +115,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/modules/solov1_head.py</url>
-          <line>685</line>
+          <line>687</line>
           <option name="timeStamp" value="23" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -135,15 +130,15 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/modules/solov1_head.py</url>
-          <line>24</line>
+          <line>23</line>
           <option name="timeStamp" value="29" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/eval.py</url>
+          <line>284</line>
+          <option name="timeStamp" value="30" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
-    <watches-manager>
-      <inline-watch fileUrl="file://$PROJECT_DIR$/train1.py" line="111">
-        <watch expression="data" language="Python" />
-      </inline-watch>
-    </watches-manager>
   </component>
 </project>

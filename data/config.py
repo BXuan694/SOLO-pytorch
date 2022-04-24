@@ -149,12 +149,12 @@ coco2017_dataset = dataset_base.copy({
    'name': 'COCO 2017',
 
     'train_prefix': '',
-    'train_info': '/home/w/data/COCO/annotations/instances_val2014.json',
+    'train_info': '/home/w/data/COCO/annotations_trainval2014/annotations/instances_val2014.json',
     'trainimg_prefix': '/home/w/data/COCO/val2014/',
     'train_images': '',
 
     'valid_prefix': '',
-    'valid_info': '/home/w/data/COCO/annotations/instances_val2014.json',
+    'valid_info': '/home/w/data/COCO/annotations_trainval2014/annotations/instances_val2014.json',
     'validimg_prefix': '/home/w/data/COCO/val2014/',
     'valid_images': '',
 
@@ -313,7 +313,7 @@ solo_bl_config = base_config.copy({
                 update_thr=0.06,
                 kernel='gaussian',  # gaussian/linear
                 sigma=2.0,
-                max_per_img=15),
+                max_per_img=100),
 
     'imgs_per_gpu': 4,
     'workers_per_gpu': 4,

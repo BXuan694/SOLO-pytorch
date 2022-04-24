@@ -29,7 +29,7 @@ class FPN(nn.Module):
         else:
             # if end_level < inputs, no extra level is allowed
             self.backbone_end_level = end_level
-            assert end_level <= len(in_channels)
+            assert end_level <= len(self.in_channels)
             assert self.num_outs == end_level - self.start_level
   
         self.end_level = end_level
@@ -116,6 +116,7 @@ class FPN(nn.Module):
                         outs.append(self.fpn_convs[i](outs[-1]))
         return tuple(outs)
 
+
 class SOLOV1(nn.Module):
     def __init__(self, cfg=None, pretrained=None, mode='train'):
         super(SOLOV1, self).__init__()
@@ -129,40 +130,29 @@ class SOLOV1(nn.Module):
             raise NotImplementedError
 
         self.fpn = FPN(cfg=cfg, upsample_cfg=dict(mode='nearest'))
-    
+
         self.bbox_head = SOLOv1DecoupleHead(num_classes = cfg.num_classes,
-                            in_channels = 256,
-                            seg_feat_channels = 256,
-                            stacked_convs = 7,
-                            strides = [8, 8, 16, 32, 32],
-                            scale_ranges=((1, 56), (28, 112), (56, 224), (112, 448), (224, 896)),
-                            num_grids = [40, 36, 24, 16, 12],
-                        )
-        
+                            in_channels=256,
+                            seg_feat_channels=256,
+                            stacked_convs=7,
+                            strides=[8, 8, 16, 32, 32],
+                            scale_ranges=((1, 96), (48, 192), (96, 384), (192, 768), (384, 2048)),
+                            num_grids=[40, 36, 24, 16, 12])
+
         self.mode = mode
-        if self.mode=="test":
-            self.nms_pre = config["test_cfg"]['nms_pre']
-            self.score_thr = config["test_cfg"]['score_thr']
-            self.mask_thr = config["test_cfg"]['mask_thr']
-            self.update_thr = config["test_cfg"]['update_thr']
-            self.kernel = config["test_cfg"]['kernel']
-            self.sigma = config["test_cfg"]['sigma']
-            self.max_per_img = config["test_cfg"]['max_per_img']
-        #self.seg_num_grids = config["head"]['num_grids']
-        #self.strides = config["head"]['strides']
-        #self.num_classes = config["head"]['num_classes']
+
+        self.test_cfg = cfg.test_cfg
 
         if self.mode == 'train':
             self.backbone.train(mode=True)
         else:
-            self.backbone.train(mode=False)
+            self.backbone.train(mode=True)
         
         if pretrained is None:
             self.init_weights() #if first train, use this initweight
-        elif pretrained is not None:
-            self.load_weights(path=pretrained)
-
-
+        else:
+            self.load_weights(pretrained)             #load weight from file
+    
     def init_weights(self):
         # fpn
         if isinstance(self.fpn, nn.Sequential):
@@ -172,23 +162,19 @@ class SOLOV1(nn.Module):
             self.fpn.init_weights()
 
         self.bbox_head.init_weights()
-    
+
     def save_weights(self, path):
         """ Saves the model's weights using compression because the file sizes were getting too big. """
         torch.save(self.state_dict(), path)
 
-    def load_weights(self, path = None, weights = None):
-        if path:
-            state_dict = torch.load(path)
-            self.load_state_dict(state_dict)
-        else:
-            self.load_state_dict(weights)
-
+    def load_weights(self, path):
+        state_dict = torch.load(path)
+        self.load_state_dict(state_dict)
  
     def extract_feat(self, img):
         """Directly extract features from the backbone+neck."""
-        x = self.backbone(img) #[1, 64, 128, 128],[128, 64],[256, 32],[512, 16]
-        x = self.fpn(x) # [1, 256, 128, 128],[256, 64],[256, 32],[256, 16],[256, 8]
+        x = self.backbone(img)
+        x = self.fpn(x)
         return x
     
     def forward_dummy(self, img):
@@ -231,7 +217,8 @@ class SOLOV1(nn.Module):
         losses = self.bbox_head.loss(*loss_inputs, gt_bboxes_ignore=gt_bboxes_ignore)
         return losses
 
-    # \\xe7\\x9f\\xad\\xe8\\xbe\\xb9resize\\xe5\\x88\\xb0448\\xef\\xbc\\x8c\\xe5\\x89\\xa9\\xe4\\xbd\\x99\\xe7\\x9a\\x84\\xe8\\xbe\\xb9pad\\xe5\\x88\\xb0\\xe8\\x83\\xbd\\xe8\\xa2\\xab32\\xe6\\x95\\xb4\\xe9\\x99\\xa4
+  
+    # 短边resize到448，剩余的边pad到能被32整除
     '''
     img_metas context
     'filename': 'data/casia-SPT_val/val/JPEGImages/00238.jpg', 
@@ -239,7 +226,6 @@ class SOLOV1(nn.Module):
     'pad_shape': (448, 672, 3), 'scale_factor': 1.1144278606965174, 'flip': False, 
     'img_norm_cfg': {'mean': array([123.675, 116.28 , 103.53 ], dtype=float32), 
     'std': array([58.395, 57.12 , 57.375], dtype=float32), 'to_rgb': True}}
-
     '''
 
     def forward_test(self, imgs, img_metas, **kwargs):
@@ -262,17 +248,24 @@ class SOLOV1(nn.Module):
         # TODO: remove the restriction of imgs_per_gpu == 1 when prepared
         imgs_per_gpu = imgs[0].size(0)
         assert imgs_per_gpu == 1
-        assert num_augs == 1
-        return self.simple_test(imgs[0], img_metas[0], **kwargs)
 
+        if num_augs == 1:
+            return self.simple_test(imgs[0], img_metas[0], **kwargs)
+        else:
+            return self.aug_test(imgs, img_metas, **kwargs)
     
     def simple_test(self, img, img_meta, rescale=False):
         #test_tensor = torch.ones(1,3,448,512).cuda()
         #x = self.extract_feat(test_tensor)
         x = self.extract_feat(img)
+
         outs = self.bbox_head(x, eval=True)
-        seg_inputs = outs + (img_meta,
-        self.nms_pre, self.score_thr,self.mask_thr, self.update_thr, self.kernel, self.sigma, self.max_per_img,
-        rescale)
+
+        seg_inputs = outs + (img_meta, self.test_cfg, rescale)
+
         seg_result = self.bbox_head.get_seg(*seg_inputs)
         return seg_result
+
+    def aug_test(self, imgs, img_metas, rescale=False):
+        """Test function with test time augmentation."""
+        raise NotImplementedError

@@ -2,14 +2,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from .backbone import resnet18, resnet34, resnet50
-from .nninit import xavier_init, kaiming_init
+from .nninit import xavier_init
 from .solov1_head import SOLOv1Head
-from .mask_feat_head import MaskFeatHead
-import torch.distributed as dist
-import torch.multiprocessing as m
-from itertools import chain
-from torch.nn.parallel import DataParallel
-
 
 class FPN(nn.Module):
     def __init__(self, 
@@ -121,7 +115,6 @@ class FPN(nn.Module):
                     else:
                         outs.append(self.fpn_convs[i](outs[-1]))
         return tuple(outs)
- 
 
 
 class SOLOV1(nn.Module):
@@ -135,7 +128,7 @@ class SOLOV1(nn.Module):
             self.backbone = resnet50(pretrained=True, loadpath = cfg.backbone.path)
         else:
             raise NotImplementedError
-        
+
         self.fpn = FPN(cfg=cfg, upsample_cfg=dict(mode='nearest'))
 
         self.bbox_head = SOLOv1Head(num_classes=cfg.num_classes,
@@ -145,7 +138,7 @@ class SOLOV1(nn.Module):
                             strides=[8, 8, 16, 32, 32],
                             scale_ranges=((1, 96), (48, 192), (96, 384), (192, 768), (384, 2048)),
                             num_grids=[40, 36, 24, 16, 12])
-        
+
         self.mode = mode
 
         self.test_cfg = cfg.test_cfg
@@ -169,7 +162,7 @@ class SOLOV1(nn.Module):
             self.fpn.init_weights()
 
         self.bbox_head.init_weights()
-    
+
     def save_weights(self, path):
         """ Saves the model's weights using compression because the file sizes were getting too big. """
         torch.save(self.state_dict(), path)
@@ -233,7 +226,6 @@ class SOLOV1(nn.Module):
     'pad_shape': (448, 672, 3), 'scale_factor': 1.1144278606965174, 'flip': False, 
     'img_norm_cfg': {'mean': array([123.675, 116.28 , 103.53 ], dtype=float32), 
     'std': array([58.395, 57.12 , 57.375], dtype=float32), 'to_rgb': True}}
-
     '''
 
     def forward_test(self, imgs, img_metas, **kwargs):
@@ -248,14 +240,11 @@ class SOLOV1(nn.Module):
         """
         for var, name in [(imgs, 'imgs'), (img_metas, 'img_metas')]:
             if not isinstance(var, list):
-                raise TypeError('{} must be a list, but got {}'.format(
-                    name, type(var)))
+                raise TypeError('{} must be a list, but got {}'.format(name, type(var)))
 
         num_augs = len(imgs)
         if num_augs != len(img_metas):
-            raise ValueError(
-                'num of augmentations ({}) != num of image meta ({})'.format(
-                    len(imgs), len(img_metas)))
+            raise ValueError('num of augmentations ({}) != num of image meta ({})'.format(len(imgs), len(img_metas)))
         # TODO: remove the restriction of imgs_per_gpu == 1 when prepared
         imgs_per_gpu = imgs[0].size(0)
         assert imgs_per_gpu == 1
@@ -271,7 +260,7 @@ class SOLOV1(nn.Module):
         x = self.extract_feat(img)
 
         outs = self.bbox_head(x, eval=True)
-  
+
         seg_inputs = outs + (img_meta, self.test_cfg, rescale)
 
         seg_result = self.bbox_head.get_seg(*seg_inputs)
