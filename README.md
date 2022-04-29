@@ -5,7 +5,7 @@ Backbone of res50 has been tested pass on coco2017-val. For backbone of res18&34
 
 # Request
 
-python3.7.11, PyTorch1.9.0, torchvision0.10.0
+python3.8.13, PyTorch1.7.1
 
 # How to use
 1. build loss
@@ -17,14 +17,10 @@ python setup.py build_ext --develop
 
 3. set configs like data/config.py
 
-4. select SOLOv1/SOLOv2 in the beginning of train.py/eval.py
+4. import SOLOv1/SOLOv2 in the beginning of train.py/eval.py
 
 # TODO:
-test solo1-decouple
-
 test video support
-
-optimize project structure
 
 finish README.md
 

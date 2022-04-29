@@ -762,8 +762,7 @@ class MultiScaleFlipAug(object):
 
     def __init__(self, transforms, img_scale, flip=False):
         self.transforms = Compose(transforms)
-        self.img_scale = img_scale if isinstance(img_scale,
-                                                 list) else [img_scale]
+        self.img_scale = img_scale if isinstance(img_scale, list) else [img_scale]
         assert isinstance(self.img_scale, list)
         self.flip = flip
 

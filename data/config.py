@@ -388,7 +388,7 @@ solo_MVtec_config = base_config.copy({
     'epoch_iters_start': 1,    #本次训练的开始迭代起始轮数
 })
 solo_coco_config = base_config.copy({
-    'name': 'solo_coco_r34',
+    'name': 'solo_coco_r50',
     'backbone': resnet50_backbone,
     'neck': fpn_r50_base,
     'dataset': coco2017_dataset,
@@ -446,7 +446,7 @@ solo_coco_config = base_config.copy({
     'epoch_iters_start': 1,    #本次训练的开始迭代起始轮数
 })
 
-cfg = solo_MVtec_config.copy()
+cfg = solo_coco_config.copy()
 
 
 def set_cfg(config_name:str):

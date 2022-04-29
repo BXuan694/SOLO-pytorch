@@ -199,7 +199,7 @@ def show_result_ins(imgAbsPath,
     return img_show
 
 
-def eval(valmodel_weight, data_path, benchmark, test_mode, save_imgs=False):
+def eval(valmodel_weight, data_path, use_json, benchmark, test_mode, save_imgs=False):
     
     test_pipeline = []
     transforms=[ dict(type='Resize', keep_ratio=True),
@@ -209,7 +209,7 @@ def eval(valmodel_weight, data_path, benchmark, test_mode, save_imgs=False):
                 dict(type='TestCollect', keys=['img']),
     ]
     transforms_piplines = build_process_pipeline(transforms)
-    Multest = process_funcs_dict['MultiScaleFlipAug'](transforms=transforms_piplines, img_scale=(768, 448), flip=False)
+    Multest = process_funcs_dict['MultiScaleFlipAug'](transforms=transforms_piplines, img_scale=cfg.test_pipeline[1]['img_scale'], flip=cfg.test_pipeline[1]['flip'])
 
     if test_mode == "video":
         test_pipeline.append(LoadImageInfo())
@@ -252,7 +252,6 @@ def eval(valmodel_weight, data_path, benchmark, test_mode, save_imgs=False):
     elif test_mode == "images":
         img_ids = []
         images = []
-        use_json = True
         if use_json == False:
             test_imgpath = data_path + '/*'
             images = glob(test_imgpath)
@@ -292,7 +291,7 @@ def eval(valmodel_weight, data_path, benchmark, test_mode, save_imgs=False):
 
             k += 1
             if save_imgs:
-                out_filepath = "results/" + os.path.basename(imgpath)
+                out_filepath = "results/solo1/" + os.path.basename(imgpath)
                 cv.imwrite(out_filepath, img_show)
             if benchmark == True:
                 result = result2json(img_id, seg_result)
@@ -304,4 +303,4 @@ def eval(valmodel_weight, data_path, benchmark, test_mode, save_imgs=False):
             fjson.write(re_js)
             fjson.close()
 
-eval(valmodel_weight='weights/solo1/solo_MVtec_r18_epoch_75.pth',data_path="/home/w/data/MVtec/d2s_annotations_v1.1/annotations/D2S_validation.json", benchmark=False, test_mode="images", save_imgs=True)
+eval(valmodel_weight='weights/solo1/solo_coco_r50_epoch_59.pth',data_path="/home/w/data/COCO/annotations_trainval2014/annotations/instances_val2014.json", use_json=True, benchmark=False, test_mode="images", save_imgs=True)
